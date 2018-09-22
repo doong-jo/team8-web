@@ -1,0 +1,27 @@
+.App {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100px;
+}
+
+.App__globalspace {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.App__globalside {
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+}
+
+.App__globalmain {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.App__header {
+    border-bottom: 1px solid #ccc;
+}

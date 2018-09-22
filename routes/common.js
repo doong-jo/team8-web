@@ -1,3 +1,4 @@
+const template = require('./template');
 const has = require('has');
 
 Date.prototype.addDays = (days) => {

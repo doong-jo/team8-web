@@ -4,8 +4,10 @@ const router = express.Router();
 
 // const template = require('./template');
 	  
-// const main = require('./router/main'),
-//       user = require('./router/user'),
+const main = require('./router/main'),
+      user = require('./router/user'),
+	  userview = require('./router/userview'),
+	  tracking = require('./router/tracking');
 //       lecture = require('./router/lecture'),
 //       email = require('./router/email'),
 //       error = require('./router/error'),
@@ -14,9 +16,15 @@ const router = express.Router();
 //       eduBanner = require('./router/eduBanner'),
 //       eduNotice = require('./router/eduNotice');
 
-router.get('/', function(req, res) {
-	res.send('Hello helper-internal-server!');
-});
+// router.get('/', function(req, res) {
+// 	res.send('Hello helper-internal-server!');
+// });
+
+router.get('/', function(req, res) { res.redirect('/main'); });
+router.use('/main', main);
+router.use('/tracking', tracking);
+router.use('/user', user);
+router.use('/userview', userview);
 
 // router.use('/category', category);
 

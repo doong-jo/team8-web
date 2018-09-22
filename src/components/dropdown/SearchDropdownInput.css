@@ -1,0 +1,21 @@
+:global .SearchDropdownInput .input-group .input-group-prepend > button {
+    border-color: #CCC;
+    border-right: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 5px;
+}
+
+:global .SearchDropdownInput .input-group > input {
+    width: 253px;
+}
+
+:global .SearchDropdownInput .input-group-append > button {
+    border-color: #ccc;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 5px;
+}
