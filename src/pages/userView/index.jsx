@@ -17,6 +17,15 @@ import Icon from '../../components/icons';
 import Table from 'rc-table';
 import 'rc-table/assets/index.css';
 
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Marker,
+} from "react-google-maps";
+
+const { DrawingManager } = require("react-google-maps/lib/components/drawing/DrawingManager");
+
 const onRowClick = (record, index, event) => {
     console.log(`Click nth(${index}) row of parent, record.name: ${record.name}`);
     // See https://facebook.github.io/react/docs/events.html for original click event details.
@@ -92,13 +101,13 @@ const data = [
     {
         key: 1,
         profile: '',
-        phone: '01034823161',
+        phone: '01034030392',
         status: 'blue',
     },
     {
         key: 2,
         profile: '',
-        phone: '01031613482',
+        phone: '01049395939',
         status: 'blue',
     },
     {
@@ -111,37 +120,37 @@ const data = [
     {
         key: 4,
         profile: '',
-        phone: '01031613482',
+        phone: '01039593923',
         status: 'blue',
     },
     {
         key: 5,
         profile: '',
-        phone: '01034823161',
+        phone: '01059495938',
         status: 'blue',
     },
     {
         key: 6,
         profile: '',
-        phone: '01031613482',
+        phone: '01094893945',
         status: 'blue',
     },
     {
         key: 7,
         profile: '',
-        phone: '01034823161',
+        phone: '01006948394',
         status: 'blue',
     },
     {
         key: 8,
         profile: '',
-        phone: '01031613482',
+        phone: '01034395594',
         status: 'blue',
     },
     {
         key: 9,
         profile: '',
-        phone: '01034823161',
+        phone: '01034593293',
         status: 'blue',
     },
     {
@@ -151,13 +160,6 @@ const data = [
         status: 'blue',
     }
 ];
-
-import {
-  withScriptjs,
-  withGoogleMap,
-  GoogleMap,
-  Marker,
-} from "react-google-maps";
 
 const chungmuroLat = 37.5634236;
 const chungmuroLong = 126.9918384;
@@ -171,10 +173,32 @@ const MapWithAMarker = withScriptjs(withGoogleMap(props =>
     defaultZoom={15}
     defaultCenter={props.center}
     center={props.center}  
-    
   >
     <Marker
       position={props.center}
+    />
+    <DrawingManager
+      defaultDrawingMode={google.maps.drawing.OverlayType.CIRCLE}
+      defaultOptions={{
+        drawingControl: true,
+        drawingControlOptions: {
+          position: google.maps.ControlPosition.TOP_CENTER,
+          drawingModes: [
+            google.maps.drawing.OverlayType.CIRCLE,
+            google.maps.drawing.OverlayType.POLYGON,
+            google.maps.drawing.OverlayType.POLYLINE,
+            google.maps.drawing.OverlayType.RECTANGLE,
+          ],
+        },
+        circleOptions: {
+          fillColor: `#ffff00`,
+          fillOpacity: 1,
+          strokeWeight: 5,
+          clickable: false,
+          editable: true,
+          zIndex: 1,
+        },
+      }}
     />
   </GoogleMap>
 ));
@@ -187,6 +211,7 @@ class UserView extends Component {
     
         this.onDeleteConfirmMdTrigger = this.onDeleteConfirmMdTrigger.bind(this);
         this.onDeleteAcceptBtnClicked = this.onDeleteAcceptBtnClicked.bind(this);
+        
     
 		this.state = { 
             deleteConfirmModalShow: false,
@@ -195,7 +220,40 @@ class UserView extends Component {
                 lng: chungmuroLong
             }
         };
+    
+        this.getLocation(this);
     }
+
+    getLocation(thisComponent) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                console.log("pos : " + pos.lat + ", " + pos.lng);
+                
+                thisComponent.setState(prevState => ({
+                    ...prevState,
+                    curGoogleMapPos: pos
+                }));
+                
+                return pos;
+            }, function() {
+                handleLocationError(true, infoWindow, map.getCenter());
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            // handleLocationError(false, infoWindow, map.getCenter());
+        }
+        
+        return {
+            lat: chungmuroLat,
+            lng: chungmuroLong
+        };
+    }
+
     componentDidMount() {
 
     }
@@ -246,8 +304,14 @@ class UserView extends Component {
                     title={this.props.pageTitle}
                 />
                 <section className={pageStyles.Page__content}>
-                    <div className={pageStyles['Page__content-top']}>
-                        
+                    <div>
+                        <Button
+                            color="primary"
+                            className={pageStyles['Page__content__table__row-btn']}
+                            onClick={() => {this.getLocation(this);}}
+                            >
+                            Set my location
+                        </Button>
                     </div>
 					
 					<div>
