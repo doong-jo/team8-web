@@ -1,4 +1,4 @@
-This is a Internal server of helper.
+Helper-internal Server.
 =============
 References
 -------------
