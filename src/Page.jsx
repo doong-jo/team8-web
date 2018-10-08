@@ -16,13 +16,13 @@ const timeFormatter = (o) => {
 
 const getFullUri = (uri, queryObj) => `${uri}?${queryString.stringify(queryObj)}`;
 
-const getISOToDateTimeLocale = time => {
-    time = time.split('.')[0].split(':');
-    time = time.splice(0, 2);
-    time = time.join(':');
-    
-    return time;
-}
+const getISOToDateTimeLocale = (time) => {
+    let convertTime = time.split('.')[0].split(':');
+    convertTime = convertTime.splice(0, 2);
+    convertTime = convertTime.join(':');
+
+    return convertTime;
+};
 
 module.exports = {
     timeFormatter, getISOToDateTimeLocale, getFullUri,

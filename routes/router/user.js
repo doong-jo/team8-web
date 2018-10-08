@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-// const userApi = require('../api/user');
+const userApi = require('../api/user');
 const commonApi = require('../common');
 
 router.get('/', (req, res, next) => {
+    userApi.getList(req.queryObj, req.optionObj, (data) => {
+        res.json(data);
+    });
+    
     const jsonTemplateData = {
         // userName : req.__user.name
 		userName : "Administartor"
@@ -12,6 +16,40 @@ router.get('/', (req, res, next) => {
     
     commonApi.initTemplate(jsonTemplateData, req, res);
 });
+
+router.put('*', (req, res, next) => {
+    console.log(req.query);
+    
+    let viewData = JSON.stringify(req.query);
+    viewData = JSON.parse(viewData);
+    
+    console.log(viewData);
+    
+    // convertPropToValue(viewData);
+    
+    req.updateQuery = viewData;
+    
+    next();
+});
+
+// router.get('/user', (req, res, next) => {
+//     userApi.getList(req.queryObj, req.optionObj, (data) => {
+//         res.json(data);
+//     });
+// });
+
+router.put('/:id?', (req, res, next) => {
+    console.log("route user put!");
+    
+    const query = req.params;
+ 
+    console.log("params : ", query);
+    
+    userApi.putUser({ query, updateQuery : req.updateQuery}, (data) => {
+        res.json(data);
+    });
+});
+
 
 // const convertPropToValue = (_viewData) => {
 //     commonApi.convertToOriginVal('mailing', _viewData);

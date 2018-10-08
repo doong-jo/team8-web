@@ -18,33 +18,21 @@ import { CommonModal } from './Modal';
 import styles from './FormModal.scss';
 import confirmModalStyles from './ConfirmModal.scss';
 import Radio from '../Radio';
-import ImageSlider from '../ImageSlider';
-import ImageUploader from '../ImageUploader';
+// import ImageSlider from '../ImageSlider';
+// import ImageUploader from '../ImageUploader';
 import SelectBox from '../SelectBox';
-import SelectItemAddList from '../SelectItemAddList';
-import { getISOToDateTimeLocale } from '../../../Page'
+// import SelectItemAddList from '../SelectItemAddList';
+import { getISOToDateTimeLocale } from '../../../Page';
 
 const labelGridRatio = 2;
 const smGridRatio = 3;
 const mdGridRatio = 4;
 const lgGridRatio = 10;
 
-const items = [
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ba800aa1d%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ba800aa1d%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.921875%22%20y%3D%22218.3%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-  },
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ba800aa20%20text%20%7B%20fill%3A%23444%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ba800aa20%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23666%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22247.3203125%22%20y%3D%22218.3%22%3ESecond%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-  },
-  {
-    src: 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ba800aa21%20text%20%7B%20fill%3A%23333%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ba800aa21%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23555%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22277%22%20y%3D%22218.3%22%3EThird%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E',
-  }
-];
-
 const InputFields = (props) => {
     let inputField;
     let imgSlide;
-    
+
     switch (props.inputField.shape) {
     case 'Input':
         inputField = (
@@ -64,7 +52,7 @@ const InputFields = (props) => {
             <AvField
                 className={styles['FormModal__content__col-item']}
                 key={props.labelFieldText}
-                type='textarea'
+                type="textarea"
                 name={props.inputField.fieldName}
                 onBlur={props.changeHandler}
                 value={props.fetchData}
@@ -99,19 +87,6 @@ const InputFields = (props) => {
         );
         break;
 
-    // For banner
-    case 'ImageSlider':
-        imgSlide = true;
-        inputField = ( 
-            <ImageSlider
-                className={styles['FormModal__content__col-item']}
-                items={items}
-                slide={imgSlide}
-                value={props.fetchData}
-            />
-        );
-        break;
-
     // For Object inputField
     default:
         // Dynamic length InputField
@@ -141,7 +116,7 @@ const InputFields = (props) => {
                             fieldName={props.inputField.fieldName.concat('-').concat(item.fieldName)}
                             placeholder={item.placeholder}
                             className={styles['FormModal__content__col-item']}
-                            options={item.value} 
+                            options={item.value}
                             onBlur={props.changeHandler}
                             value={props.fetchData}
                         />
@@ -149,37 +124,36 @@ const InputFields = (props) => {
                 ));
                 break;
 
-            case 'SelectItemAddLlist':
-                inputField = (
-                    <SelectItemAddList
-                        fieldName={props.inputField.fieldName}
-                        selectClassName={styles['FormModal__content__col-item']}
-                        rowClassName={styles['FormModal__content__inline-row']}
-                        colClassName={styles['FormModal__content__inline-col']}
-                        btnColClassName={[styles['FormModal__content__inline-col'], styles['FormModal__content__col-item']].join(' ')}
-                        selectItems={props.inputField.shape.items}
-                        removeItemBtnTxt={props.inputField.shape.exceptionBtnTxt}
-                        onChangeHandler={props.changeHandler}
-                        value={props.fetchData}
-                    />
-                );
-                break;
-                
-            case 'ImageUpload':
-                inputField = (
-                    <ImageUploader
-                        fieldName={props.inputField.fieldName}
-                        multiSize={props.inputField.shape.multiSize}
-                        dynamicSize={props.inputField.shape.dynamicSize}
-                        src={props.inputField.shape.src}
-                        smSrc={props.inputField.shape.smSrc}
-                        mdSrc={props.inputField.shape.mdSrc}
-                        lgSrc={props.inputField.shape.lgSrc}
-                        onChangeHandler={props.changeHandler}
-                        value={props.fetchData}
-                    />
-                );
-                break;
+            // case 'SelectItemAddLlist':
+            //     inputField = (
+            //         <SelectItemAddList
+            //             fieldName={props.inputField.fieldName}
+            //             selectClassName={styles['FormModal__content__col-item']}
+            //             rowClassName={styles['FormModal__content__inline-row']}
+            //             colClassName={styles['FormModal__content__inline-col']}
+            //             btnColClassName={[styles['FormModal__content__inline-col'], styles['FormModal__content__col-item']].join(' ')}
+            //             selectItems={props.inputField.shape.items}
+            //             removeItemBtnTxt={props.inputField.shape.exceptionBtnTxt}
+            //             onChangeHandler={props.changeHandler}
+            //             value={props.fetchData}
+            //         />
+            //     );
+            //     break;
+            // case 'ImageUpload':
+            //     inputField = (
+            //         <ImageUploader
+            //             fieldName={props.inputField.fieldName}
+            //             multiSize={props.inputField.shape.multiSize}
+            //             dynamicSize={props.inputField.shape.dynamicSize}
+            //             src={props.inputField.shape.src}
+            //             smSrc={props.inputField.shape.smSrc}
+            //             mdSrc={props.inputField.shape.mdSrc}
+            //             lgSrc={props.inputField.shape.lgSrc}
+            //             onChangeHandler={props.changeHandler}
+            //             value={props.fetchData}
+            //         />
+            //     );
+            //     break;
 
             default: break;
             }
@@ -253,15 +227,11 @@ class FormModal extends CommonModal {
                     Object.entries(Items).map(([key, value]) => {
                         let inputGridRatio = 0;
                         let fetchData = '';
-                        
-                        if( has(this.props, 'fetchData') && this.props.fetchData) {
+
+                        if (has(this.props, 'fetchData') && this.props.fetchData) {
                             fetchData = this.props.fetchData[value.fieldName];
                         }
-                        
-                        if( key === 'Preview' ) {
-                            fetchData = this.props.fetchData;
-                        }
-                        
+
                         switch (value.shape) {
                         case 'Input':
                         case 'InputNumeric': inputGridRatio = smGridRatio; break;
@@ -351,7 +321,7 @@ class FormModal extends CommonModal {
                                             <br />
                                         </div>
                                     }
-                                    
+
                                     {this.props.nestedModalBody}
                                 </ModalBody>
                                 <ModalFooter>
@@ -360,7 +330,7 @@ class FormModal extends CommonModal {
                                             {this.props.modalCancelBtnTxt}
                                         </Button>
                                     }
-                                    <Button color="primary" onClick={(e) => {this.props.onAccept(); this.onNestedModalTrigger();}}>
+                                    <Button color="primary" onClick={(e) => { this.props.onAccept(); this.onNestedModalTrigger(); }}>
                                         {this.props.nestedModalAcceptBtnTxt}
                                     </Button>
                                 </ModalFooter>

@@ -14,32 +14,33 @@ class SelectBox extends Component {
         this.state = {
             selectValue: '',
         };
-        
+
         this.clearable = false;
-        this.disabled = false;
         this.rtl = false;
         this.searchable = false;
     }
     componentDidMount() {
-        
+
     }
     updateValue(newValue) {
         this.setState({
             selectValue: newValue.value,
-        }, () => { 
-            if( !this.state.selectValue ) return;
-            if( !this.props.changeHandler ) return;
-            
-            this.props.changeHandler(
-            {
-                target: 
-                {
-                    name: this.props.fieldName,
-                    value: this.state.selectValue,
-                    label: newValue.label,
-                },
+        }, () => {
+            if (!this.state.selectValue) {
+                return;
             }
-        ); });
+            if (!this.props.changeHandler) {
+                return;
+            }
+            this.props.changeHandler({
+                target:
+                    {
+                        name: this.props.fieldName,
+                        value: this.state.selectValue,
+                        label: newValue.label,
+                    },
+            });
+        });
     }
     selectValue(selectValue) {
         console.log('Select value : ', selectValue);
@@ -59,7 +60,6 @@ class SelectBox extends Component {
                 clearable={this.clearable}
                 value={this.state.selectValue}
                 name={this.props.fieldName}
-                disabled={this.disabled}
                 onChange={this.updateValue}
                 rtl={this.rtl}
                 searchable={this.searchable}

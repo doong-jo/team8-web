@@ -6,9 +6,6 @@ import CommonModal from './CommonModal';
 import styles from './ConfirmModal.scss';
 
 class ConfirmModal extends CommonModal {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return (
             <Modal

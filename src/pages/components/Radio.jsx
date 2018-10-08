@@ -17,12 +17,12 @@ class Radio extends Component {
     componentWillMount() {
         this.mounted = true;
         const radio = this.props.values[0];
-        
+
         this.props.onChnageHandler({
             target: {
                 name: this.props.fieldName,
                 value: radio,
-            }
+            },
         });
     }
     onRadioBtnClicked(radioSelected) {
@@ -32,13 +32,12 @@ class Radio extends Component {
                     target: {
                         name: this.props.fieldName,
                         value: radioSelected,
-                    }
+                    },
                 });
             });
         }
     }
     render() {
-        
         return (
             <div className={this.props.className}>
                 {
