@@ -25,7 +25,15 @@ const {
     withGoogleMap,
     GoogleMap,
     Marker,
+    StreetViewPanorama,
+    OverlayView,
 } = require('react-google-maps');
+
+const getPixelPositionOffset = (width, height) => ({
+    x: -(width / 2),
+    y: -(height / 2),
+})
+
 
 const { DrawingManager } = require('react-google-maps/lib/components/drawing/DrawingManager');
 
@@ -87,43 +95,29 @@ const columns = [
 const chungmuroLat = 37.5634236;
 const chungmuroLong = 126.9918384;
 
-const jamsuBridgeLat = 37.512180;
-const jamsuBridgeLong = 126.998455;
-
-
 const MapWithAMarker = withScriptjs(withGoogleMap(props => (
     <GoogleMap
         defaultZoom={15}
         defaultCenter={props.center}
         center={props.center}
     >
+        <StreetViewPanorama 
+            defaultPosition={props.center} 
+            position={{ lat: props.streetViewLat, lng: props.streetViewLong }} 
+            visible={props.streetViewVisible}
+            onVisibleChanged={props.streetViewVisibleChanged}>
+            <OverlayView
+                position={{ lat: props.streetViewLat, lng: props.streetViewLong }}
+                mapPaneName={OverlayView.OVERLAY_LAYER}
+                getPixelPositionOffset={getPixelPositionOffset}
+            >
+                <div style={{ background: `red`, color: `white`, padding: 5, borderRadius: `50%` }}>
+                    Accident Position
+                </div>
+            </OverlayView>
+        </StreetViewPanorama>
         <Marker
             position={props.center}
-        />
-        <DrawingManager
-            defaultDrawingMode={google.maps.drawing.OverlayType.CIRCLE}
-            defaultOptions={
-                {
-                    drawingControl: true,
-                    drawingControlOptions: {
-                        position: google.maps.ControlPosition.TOP_CENTER,
-                        drawingModes: [
-                            google.maps.drawing.OverlayType.CIRCLE,
-                            google.maps.drawing.OverlayType.POLYGON,
-                            google.maps.drawing.OverlayType.POLYLINE,
-                            google.maps.drawing.OverlayType.RECTANGLE,
-                        ],
-                    },
-                    circleOptions: {
-                        fillColor: '#ffff00',
-                        fillOpacity: 1,
-                        strokeWeight: 5,
-                        clickable: false,
-                        editable: true,
-                        zIndex: 1,
-                    },
-                }
-            }
         />
     </GoogleMap>
 )));
@@ -132,178 +126,170 @@ class UserView extends Component {
     constructor(props) {
         super(props);
 
-        this.onDeleteConfirmMdTrigger = this.onDeleteConfirmMdTrigger.bind(this);
-        this.onDeleteAcceptBtnClicked = this.onDeleteAcceptBtnClicked.bind(this);
+        this.onCellConfirmMdTrigger = this.onCellConfirmMdTrigger.bind(this);
+        this.onCellAcceptBtnClicked = this.onCellAcceptBtnClicked.bind(this);
+        this.onStreetViewVisibleChanged = this.onStreetViewVisibleChanged.bind(this);
+        this.getLocation = this.getLocation.bind(this);
 
         this.state = {
-            deleteConfirmModalShow: false,
+            cellConfirmModalShow: false,
             curGoogleMapPos: {
                 lat: chungmuroLat,
                 lng: chungmuroLong,
             },
+            userTableData: [],
+            accidentData: [],
+            accidentUserDataStr: "",
+            streetViewVisible: false,
+            streetViewPos: {
+                latitude: null,
+                longitude: null,
+            }
         };
-        
-        this.state.tableData = [
-            {
-                key: 1,
-                profile: '',
-                phone: '01034030392',
-                status: 'blue',
-            },
-            {
-                key: 2,
-                profile: '',
-                phone: '01049395939',
-                status: 'blue',
-            },
-            {
-                key: 3,
-                profile: '',
-                phone: '01034823161',
-                status: 'red',
-                alert: 'emergency',
-            },
-            {
-                key: 4,
-                profile: '',
-                phone: '01039593923',
-                status: 'blue',
-            },
-            {
-                key: 5,
-                profile: '',
-                phone: '01059495938',
-                status: 'blue',
-            },
-            {
-                key: 6,
-                profile: '',
-                phone: '01094893945',
-                status: 'blue',
-            },
-            {
-                key: 7,
-                profile: '',
-                phone: '01006948394',
-                status: 'blue',
-            },
-            {
-                key: 8,
-                profile: '',
-                phone: '01034395594',
-                status: 'blue',
-            },
-            {
-                key: 9,
-                profile: '',
-                phone: '01034593293',
-                status: 'blue',
-            },
-            {
-                key: 10,
-                profile: '',
-                phone: '01031613482',
-                status: 'blue',
-            },
-        ];
         
         this.apiUri = {
-            user: '/userView/user',
+            // user: '/userView/user',
+            user: '/user',
+            accident: '/accident',
         };
 
-        this.getLocation(this);
+        this.getLocation();
         this.getUserEmergencyState();
     }
     
-
     componentDidMount() {
 
     }
 
-    onCellClick(thisPageComponent, index, event) {
-        if (index === 2) {
-            thisPageComponent.setState(prevState => ({
-                ...prevState,
-                deleteConfirmModalShow: !prevState.deleteConfirmModalShow,
-                curGoogleMapPos: {
-                    lat: jamsuBridgeLat,
-                    lng: jamsuBridgeLong,
-                },
-            }));
+    async onCellClick(thisPageComponent, index, event) {
+        console.log("emergency row : " + thisPageComponent.state.userTableData[index].alert);
+        const pivot = thisPageComponent.state.userTableData[index];
+        
+        if ( pivot.alert === "emergency" ) {
+            const queryObj = {
+                user_id: pivot.email,
+                sort: "occured_date",
+                order: -1,
+                limit: 1,
+            };
+            
+            await axios.get(getFullUri(thisPageComponent.apiUri.accident, queryObj))
+                .then((res) => {
+                    let result = res.data[0];
+                    
+                    console.log("result accident data : ", result);
+                    
+                    thisPageComponent.setState(prevState => ({
+                        ...prevState,
+                        cellConfirmModalShow: !prevState.cellConfirmModalShow,
+                        curGoogleMapPos: {
+                            lat: result.position.latitude,
+                            lng: result.position.longitude,
+                        },
+                        
+                        accidentUserDataStr:
+                            "이메일 : " + pivot.email + "\n" +
+                            "이름 : " + pivot.name + "\n" +
+                            "전화번호 : " + pivot.phone + "\n" +
+                            "라이딩 유형 : " + pivot.riding_type + "\n" +
+                            "마지막 접속 : " + pivot.lastAccess + "\n" +
+                            "위치 : " + result.position.latitude + ", " + result.position.longitude + "\n",
+                    }));
+                });
         }
     }
-    onDeleteAcceptBtnClicked() {
+    
+    onStreetViewVisibleChanged() {
+        console.log('called onStreetViewVisibleChanged! ');
+        
+        
         this.setState(prevState => ({
             ...prevState,
-            deleteConfirmModalShow: !prevState.deleteConfirmModalShow,
+            streetViewVisible: !prevState.streetViewVisible,
+        }));
+    }
+    
+    onCellAcceptBtnClicked() {
+        console.log('called onCellAcceptBtnClicked!');
+        
+        this.setState(prevState => ({
+            ...prevState,
+            streetViewPos: prevState.curGoogleMapPos,
+            streetViewVisible: true,
+            cellConfirmModalShow: !prevState.cellConfirmModalShow,
         }));
     }
 
-    onDeleteConfirmMdTrigger() {
+    onCellConfirmMdTrigger() {
         this.setState(prevState => ({
             ...prevState,
-            deleteConfirmModalShow: !prevState.deleteConfirmModalShow,
+            cellConfirmModalShow: !prevState.cellConfirmModalShow,
         }));
     }
 
-    getLocation(thisComponent) {
+    getLocation() {
+        console.log("called getLocation!");
+        
         if (navigator.geolocation) {
+            console.log("is geolocation!");
             navigator.geolocation.getCurrentPosition((position) => {
                 const pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                 };
+                
+                console.log("get position :", pos);
 
-                thisComponent.setState(prevState => ({
+                this.setState(prevState => ({
                     ...prevState,
                     curGoogleMapPos: pos,
                 }));
 
                 return pos;
-            }, () => {
+            }, (error) => {
+                console.log("handleLocationError Geolocation: ", error);
                 // handleLocationError(true, infoWindow, map.getCenter());
             });
         } else {
+            console.log("Browser doesn't support Geolocation");
             // Browser doesn't support Geolocation
             // handleLocationError(false, infoWindow, map.getCenter());
         }
-
-        return {
-            lat: chungmuroLat,
-            lng: chungmuroLong,
-        };
     }
     
     async getUserEmergencyState() {
         
         const queryObj = {
-            limit: 1,
-            id: "sdong001"
+            // limit: 1,
+            // id: "sdong001"
         };
         
         await axios.get(getFullUri(this.apiUri.user, queryObj))
             .then((res) => {
-                let result = res.data[0];
+                let result = res.data;
             
+                console.log('data length: ' + res.data.length);
                 console.log('result', result);
                 console.log('result.emergency', result.emergency);
-            
-                let modifyTableData = this.state.tableData;
-            
-                if(result.emergency === true) {
-                    modifyTableData[2].status = 'red';
-                    modifyTableData[2].alert = 'emergency';
-                } else {
-                    modifyTableData[2].status = 'blue';
-                    modifyTableData[2].alert = '';
-                }
-            
-                console.log('modifyTableData[2]', modifyTableData[2]);
                 
-            
+                let newTableData = [];
+                for (var i = 0; i < result.length; i++) {
+                    const pivot = result[i];
+                    newTableData[i] = {
+                        key: i,
+                        profile: '',
+                        phone: pivot.phone,
+                        email: pivot.email,
+                        name: pivot.name,
+                        riding_type: pivot.riding_type,
+                        status: pivot.emergency ? 'red' : 'blue',
+                        alert: pivot.emergency ? 'emergency' : '',
+                    };
+                }
+                
                 this.setState(prevState => ({
                     ...prevState,
-                    tableData: modifyTableData,
+                    userTableData: newTableData,
                 }));
             });
         
@@ -327,7 +313,7 @@ class UserView extends Component {
                         <Button
                             color="primary"
                             className={pageStyles['Page__content__table__row-btn']}
-                            onClick={() => { this.getLocation(this); }}
+                            onClick={this.getLocation}
                         >
                             Set my location
                         </Button>
@@ -336,18 +322,22 @@ class UserView extends Component {
                     <div>
                         <div className={styles.UserView__googleMap}>
                             <MapWithAMarker
-                                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k&v=3.exp&libraries=geometry,drawing,places"
+                                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k&v=3.exp&libraries=geometry,places"
                                 loadingElement={<div style={{ height: '100%' }} />}
                                 containerElement={<div style={{ height: '700px' }} />}
                                 mapElement={<div style={{ height: '100%' }} />}
                                 center={this.state.curGoogleMapPos}
+                                streetViewVisible={this.state.streetViewVisible}
+                                streetViewVisibleChanged={this.onStreetViewVisibleChanged}
+                                streetViewLat={this.state.streetViewPos.lat}
+                                streetViewLong={this.state.streetViewPos.lng}
                             />
                         </div>
 
                         <div className={styles.UserView__dataTable}>
                             <Table
                                 columns={columns}
-                                data={this.state.tableData}
+                                data={this.state.userTableData}
                                 showHeader={false}
                                 onRow={(record, index) => ({
                                     onClick: this.onCellClick.bind(null, this, index),
@@ -358,19 +348,19 @@ class UserView extends Component {
                     </div>
                 </section>
                 <ConfirmModal
-                    isOpen={this.state.deleteConfirmModalShow}
+                    isOpen={this.state.cellConfirmModalShow}
                     fade={true}
                     backdrop={false}
                     centered
                     size="md"
                     modalHeader="확인"
-                    modalBody="Emergency situation type 404 occured!"
+                    modalBody={this.state.accidentUserDataStr}
                     confirmIcon={emergencyIcon}
-                    onClose={this.onDeleteConfirmMdTrigger}
+                    onClose={this.onCellConfirmMdTrigger}
                     cancelBtn
                     cancelBtnTxt="Cancel"
-                    onAccept={this.onDeleteAcceptBtnClicked}
-                    acceptBtnTxt="See Details"
+                    onAccept={this.onCellAcceptBtnClicked}
+                    acceptBtnTxt="See Roadview"
                 />
             </div>
         );

@@ -9,13 +9,14 @@ const option = {
 	useNewUrlParser: true
 };
 
-let mongooseCon = mongoose.createConnection('mongodb://localhost:27017/admin', option);
+let mongooseCon = mongoose.createConnection('mongodb://josungdong:01034823161@localhost:25321/admin', option);
 
 const userFields = {
-	id: String,
-	passwd: String,
 	email: String,
-	type: String,
+	passwd: String,
+	name: String,
+	phone: String,
+	riding_type: String,
     emergency: Boolean,
     lastAccess: Date,
     lastPosition: Array,

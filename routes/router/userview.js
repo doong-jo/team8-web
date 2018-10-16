@@ -33,10 +33,4 @@ router.get('*', (req, res, next) => {
     next();
 });
 
-router.get('/user', (req, res, next) => {
-    userApi.getList(req.queryObj, req.optionObj, (data) => {
-        res.json(data);
-    });
-});
-
 module.exports = router;

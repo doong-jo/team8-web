@@ -5,9 +5,10 @@ const router = express.Router();
 // const template = require('./template');
 	  
 const main = require('./router/main'),
-      user = require('./router/user'),
-	  userview = require('./router/userview'),
-	  tracking = require('./router/tracking');
+    user = require('./router/user'),
+    userview = require('./router/userview'),
+    tracking = require('./router/tracking'),
+    accident = require("./router/accident");
 //       lecture = require('./router/lecture'),
 //       email = require('./router/email'),
 //       error = require('./router/error'),
@@ -25,6 +26,7 @@ router.use('/main', main);
 router.use('/tracking', tracking);
 router.use('/user', user);
 router.use('/userview', userview);
+router.use('/accident', accident);
 
 // router.use('/category', category);
 

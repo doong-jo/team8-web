@@ -1,3 +1,9 @@
+# private key
+*.pem
+
+# c9
+.c9/
+
 # React
 bundle.js*
 

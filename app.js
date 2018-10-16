@@ -1,23 +1,29 @@
 const express = require('express'),
-      app = express(),
-      bodyParser = require('body-parser'),
-      errorHandler = require('errorhandler'),
-      methodOverride = require('method-override');
+    app = express(),
+    bodyParser = require('body-parser'),
+    errorHandler = require('errorhandler'),
+    methodOverride = require('method-override');
 
 const path = require('path'),
-      fs = require('fs'),
-      has = require('has'),
-      os = require('os'),
-      http = require('http'),
-      https = require('https'),
-      mongoose = require('mongoose');
+    fs = require('fs'),
+    has = require('has'),
+    os = require('os'),
+    http = require('http'),
+    https = require('https'),
+    mongoose = require('mongoose');
 
+const SSLoptions = {  
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
 
 // TODO : use process.env
-const port = 80,
-      tempDir = __dirname + '/temp_files/',
-	  mongoURI = 'mongodb://localhost:27017/admin';
-
+const port1 = 80,
+    port2 = 443,
+    tempDir = __dirname + '/temp_files/',
+    mongoURI = 'mongodb://josungdong:01034823161@localhost:25321/admin';
+	  
+//mongoose.connect('mongodb://username:password@host:port/database?options...');
 // const category = require('./routes/api/category');
 
 /*---------------------------------SETUP----------------------------------*/
@@ -25,8 +31,6 @@ const port = 80,
 //////////////////////////////////SET EXPRESS CONFIGS///////////////////////////
 
 app.locals.mongodb = 'mongodb';
-
-app.set('port', port);
 
 app.use(express.static(path.resolve('public')));
 app.use(bodyParser.json());
@@ -51,7 +55,7 @@ db.once('open', function(){
     // CONNECTED TO MONGODB SERVER
     console.log("Connected to mongod server");
 	
-	// db.createCollection("tracking");
+    // db.createCollection("tracking");
 });
 
 
@@ -59,12 +63,12 @@ const option = {
     socketTimeoutMS: 30000,
     keepAlive: true,
     reconnectTries: 30000,
-	useNewUrlParser: true
+    useNewUrlParser: true
 };
 
 mongoose.connect(mongoURI, option).then(function(){
     //connected successfully
-	console.log('connect successfully');
+    console.log('connect successfully');
 }, function(err) {
     //err handle
 });
@@ -93,8 +97,12 @@ const mainRouter = require('./routes/index');
 app.use('/', mainRouter);
 
 
-http.createServer(app).listen(port, () => {
-	console.log("Express server listening on port " + port);
+http.createServer(app).listen(port1, () => {
+    console.log("Express server listening on port " + port1);
+});
+
+https.createServer(SSLoptions, app).listen(port2, () => {
+    console.log("Express server listening on port " + port2);
 });
 /*----------------------------------------------------------------------------*/
 

@@ -9,7 +9,7 @@ const option = {
 	useNewUrlParser: true
 };
 
-let mongooseCon = mongoose.createConnection('mongodb://localhost:27017/admin', option);
+let mongooseCon = mongoose.createConnection('mongodb://josungdong:01034823161@localhost:25321/admin', option);
 
 const trackingFields = {
 	tracking: String,
