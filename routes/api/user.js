@@ -34,7 +34,7 @@ module.exports = {
     putUser : (viewReq, callback) => {
         let mongoQuery = commonApi.getUpdateQuery(viewReq);
         
-        if( has(mongoQuery.query, 'id') ){
+        if( has(mongoQuery.query, 'email') ){
             userModel.put(mongoQuery, (data) => {
                 callback(data);
             });

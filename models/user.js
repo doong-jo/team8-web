@@ -26,22 +26,12 @@ module.exports = {
     put : function(commandObj, callback) {
         console.log(commandObj);
         
-        db.user.findOne(commandObj.query).exec(function (err, data) {
+        db.user.updateOne(commandObj.query, { $set : commandObj.updateQuery }, function (err) {
             if (err) {
-                return callback(false);
+                callback(false);
+            } else {
+                callback(true);
             }
-            
-            if (!data) {
-                return callback(false);
-            }
-            
-            db.user.update(commandObj.query, { $set : commandObj.updateQuery }, function (err) {
-                if (err) {
-                    callback(false);
-                } else {
-                    callback(true);
-                }
-            });
         });
     },
     

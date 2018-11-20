@@ -7,6 +7,31 @@ Date.prototype.addDays = (days) => {
     return date;
 };
 
+const whatIsIt = (object) => {
+    const stringConstructor = "test".constructor;
+    const arrayConstructor = [].constructor;
+    const objectConstructor = {}.constructor;
+
+    if (object === null) {
+        return "null";
+    }
+    else if (object === undefined) {
+        return "undefined";
+    }
+    else if (object.constructor === stringConstructor) {
+        return "String";
+    }
+    else if (object.constructor === arrayConstructor) {
+        return "Array";
+    }
+    else if (object.constructor === objectConstructor) {
+        return "Object";
+    }
+    else {
+        return "don't know";
+    }
+}
+
 module.exports = {
     initTemplate : (state, req, res) => {
         const initState = state;
@@ -21,7 +46,23 @@ module.exports = {
             } else if( key === 'sort' ) {
                 optionObj[key] = viewData[key];
             }else {
-                queryObj[key] = viewData[key];
+                try{
+                    queryObj[key] = JSON.parse(viewData[key]);
+                } catch (e) {
+                    queryObj[key] = viewData[key];  
+                }
+            }
+        }
+    },
+    
+    convertObjToGetMethodRegex : (queryObj, optionObj, viewData) => {
+        for(const key in viewData) {
+            if( key === 'order'  || key === 'skip' || key === 'limit') {
+                optionObj[key] = JSON.parse(viewData[key]);
+            } else if( key === 'sort' ) {
+                optionObj[key] = viewData[key];
+            }else {
+                queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
             }
         }
     },
@@ -49,7 +90,7 @@ module.exports = {
         return mongoQuery;
     },
 	
-	getUpdateQuery : (queryObj) => {
+    getUpdateQuery : (queryObj) => {
         let mongoQuery = {
             query : {},
             updateQuery : {},

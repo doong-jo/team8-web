@@ -94,6 +94,7 @@ const mainRouter = require('./routes/index');
 // 	res.send("Hello seoul fooding!");
 // });
 // app.all('*', checkAuth);
+app.use(express.static('public'));
 app.use('/', mainRouter);
 
 

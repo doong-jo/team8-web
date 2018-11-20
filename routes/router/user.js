@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const userFields = require(__dirname + '/../../models/schema/user_info').getFields();
 
 const has = require('has');
 
@@ -13,6 +14,17 @@ const formValidation = (query) => {
         query.lastAccess.setHours(query.startAt.getHours() - 9);
     }
 };
+
+const convertPropToValue = (query) => {
+    
+    for (var key in userFields) {
+        if( Array == userFields[key] && has(query, key)) {
+            let ledStr = query[key];
+            console.log("array key", key)
+            query[key] = ledStr.replace('[','').replace(']','').split(",").map(String);
+        }
+    }
+}
 
 router.get('*', (req, res, next) => {
     const viewData = req.query;
@@ -55,7 +67,7 @@ router.put('*', (req, res, next) => {
     
     console.log(viewData);
     
-    // convertPropToValue(viewData);
+    convertPropToValue(viewData);
     
     req.updateQuery = viewData;
     
@@ -66,7 +78,7 @@ router.put('/:email?', (req, res, next) => {
     console.log("route user put!");
     
     const query = req.params;
- 
+    
     console.log("params : ", query);
     
     userApi.putUser({ query, updateQuery : req.updateQuery}, (data) => {

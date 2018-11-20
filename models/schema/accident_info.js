@@ -16,6 +16,7 @@ const accidentFields = {
     riding_type: String,
     occured_date: Date,
     position: Object,
+    has_alerted: Boolean,
 };
 
 const accidentSchema = new schema(accidentFields, { collection: 'accident', bufferCommands: false }),
