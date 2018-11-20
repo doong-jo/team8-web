@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 // import { EduBanner, EduPromotion } from '../pages/index';
-import { UserView } from '../pages/';
+import { UserView, DeviceView } from '../pages/';
 import Header from '../components/common/Header';
 import SideMenu from '../components/common/SideMenu';
 import styles from './App.scss';
@@ -21,6 +21,7 @@ const App = () =>
                 </div>
                 <div className={`GlobalMain ${styles.App__globalmain}`}>
                     <Route exact path="/userView" render={() => <UserView pageTitle="사용자 뷰" />} />
+                    <Route exact path="/deviceView" render={() => <DeviceView pageTitle="디바이스 뷰" />} />
                 </div>
             </div>
         </div>

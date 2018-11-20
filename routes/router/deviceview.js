@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const userApi = require('../api/user');
 const commonApi = require('../common');
 
 router.get('/', (req, res, next) => {
-    console.log('route /userview');
+    console.log('route /deviceview');
     const jsonTemplateData = {
         // userName : req.__user.name
         userName : "Administartor"
@@ -22,10 +21,6 @@ router.get('*', (req, res, next) => {
         optionObj = {};
     
     commonApi.convertObjToGetMethod(queryObj, optionObj, viewData);
-    
-    console.log('queryObj', queryObj);
-    console.log('optionObj', optionObj);
-    console.log('viewData', viewData);
     
     req.queryObj = queryObj;
     req.optionObj = optionObj;
