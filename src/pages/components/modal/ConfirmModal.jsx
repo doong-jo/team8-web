@@ -25,7 +25,7 @@ class ConfirmModal extends CommonModal {
                         </div>
                     }
                     
-                    <p style={{whiteSpace: 'pre'}}>{this.props.modalBody}</p>
+                    {this.props.modalBody}
                 </ModalBody>
                 <ModalFooter>
                     {this.props.cancelBtn &&

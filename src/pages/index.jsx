@@ -1,2 +1,3 @@
-export { default as UserView } from './userView/index';
-export { default as DeviceView} from './deviceView/index';
+export { default as UserView } from './analysis/userView/index';
+export { default as DeviceTestingView } from './analysis/deviceTestingView/index';
+export { default as AccidentView } from './analysis/accidentView/index';

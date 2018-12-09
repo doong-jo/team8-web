@@ -11,22 +11,19 @@ const option = {
 
 let mongooseCon = mongoose.createConnection('mongodb://josungdong:01034823161@localhost:25321/admin', option);
 
-const accidentFields = {
-    user_id: String,
-    riding_type: String,
+const devicetestFields = {
     occured_date: Date,
-    position: Object,
-    has_alerted: Boolean,
+    complimentary: Number,
+    roll: Number,
     accel: Number,
-    rollover: Number,
 };
 
-const accidentSchema = new schema(accidentFields, { collection: 'accident', bufferCommands: false }),
+const devicetestSchema = new schema(devicetestFields, { collection: 'devicetest', bufferCommands: false }),
     db = {
-        accident: mongooseCon.model('accident', accidentSchema),
+        devicetest: mongooseCon.model('devicetest', devicetestSchema),
     };
 
 module.exports = {
     getDB: () => db,
-    getFields: () => accidentFields
+    getFields: () => devicetestFields
 };

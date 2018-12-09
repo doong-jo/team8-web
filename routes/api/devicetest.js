@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const has = require('has');
 
-const accidentModel = require('../../models/accident');
+const devicetestModel = require('../../models/devicetest');
 
 const commonApi = require('../common');
 
@@ -12,8 +12,8 @@ const getDefaultProjection = {
 
 module.exports = {
     
-    createAccident : (snapshot, callback) => {
-        accidentModel.insert(snapshot, (data) => {
+    createdevicetest : (snapshot, callback) => {
+        devicetestModel.insert(snapshot, (data) => {
             callback(data);
         });
     },
@@ -29,8 +29,8 @@ module.exports = {
             
             mongoQuery.query = convertQuery;
         }
-        
-        accidentModel.find(mongoQuery, (data) => {
+    
+        devicetestModel.find(mongoQuery, (data) => {
             callback(data);
         });
     },

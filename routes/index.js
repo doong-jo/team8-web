@@ -1,33 +1,30 @@
 const express = require('express');
 const router = express.Router();
-// const category = require('./router/category');
-
-// const template = require('./template');
 	  
 const main = require('./router/main'),
     user = require('./router/user'),
-    userview = require('./router/userview'),
     tracking = require('./router/tracking'),
     accident = require("./router/accident"),
     led = require("./router/led"),
     category = require("./router/category"),
-    device = require("./router/deviceview");
+    devicetest = require("./router/devicetest"),
+    viewPage = require("./router/viewpage");
 
-router.get('/', function(req, res) { res.redirect('/main'); });
+router.get('/', (req, res, err) => { res.redirect('/main');});
 router.use('/main', main);
 router.use('/tracking', tracking);
 router.use('/user', user);
 router.use('/accident', accident);
 router.use('/led', led);
 router.use('/category', category);
+router.use('/devicetest', devicetest);
 
-//page
-router.use('/userview', userview);
-router.use('/deviceview', device);
+// pages
+router.use(['/userview', '/deviceview', '/accidentview'], viewPage);
 
-router.get('*', function(req, res) {
-    res.json('접근할 수 없는 페이지입니다.');
-});
-
+// router.get('*', (req, res, next) => {
+//     console.log('index all route!');
+//     next();
+// })
 
 module.exports = router;

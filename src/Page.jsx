@@ -1,5 +1,7 @@
 import queryString from 'querystring';
 
+const formattedNumberTwoDigit = (number) => ("0" + number).slice(-2);
+
 const timeFormatter = (o) => {
     let time = '';
     let timeObj;
@@ -8,13 +10,14 @@ const timeFormatter = (o) => {
         timeObj = new Date(o);
         todayMonth = timeObj.getMonth() + 1;
         time =
-            `${timeObj.getFullYear()}/${todayMonth}/${timeObj.getDate()}
-            ${timeObj.getHours()}:${timeObj.getMinutes()}`;
+            `${timeObj.getFullYear()}-${formattedNumberTwoDigit(todayMonth)}-${formattedNumberTwoDigit(timeObj.getDate())}T${formattedNumberTwoDigit(timeObj.getHours())}:${formattedNumberTwoDigit(timeObj.getMinutes())}`;
     }
     return time;
 };
 
 const getFullUri = (uri, queryObj) => `${uri}?${queryString.stringify(queryObj)}`;
+
+const getFullUriNotStringify = (uri, queryObj) => `${uri}?${queryObj}`;
 
 const getISOToDateTimeLocale = (time) => {
     let convertTime = time.split('.')[0].split(':');
@@ -25,5 +28,5 @@ const getISOToDateTimeLocale = (time) => {
 };
 
 module.exports = {
-    timeFormatter, getISOToDateTimeLocale, getFullUri,
+    timeFormatter, getISOToDateTimeLocale, getFullUri, getFullUriNotStringify,
 };

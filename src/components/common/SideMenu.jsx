@@ -4,81 +4,89 @@ import styles from './SideMenu.scss';
 import Icon from '../icons';
 
 export default class SideMenu extends React.Component {
-	render() {
+    render() {
 		
-		const iconStyle = {
-			'marginRight' : '3px'
-		};
+	    const iconStyle = {
+            'marginRight' : '3px'
+        };
 		
-		return (
-			<div className={`SideMenu ${styles.SideMenu}`}  >
+        return (
+            <div className={`SideMenu ${styles.SideMenu}`}  >
                 <div className={styles.SideMenu__menu}>
-                    <span className={`TopMenu ${styles.SideMenu__top}`}> 사용자 관리 </span>
+                    <span className={`TopMenu ${styles.SideMenu__top}`}> Users </span>
                     <Nav vertical>
                         <NavItem>
                             <NavLink href="/user">
-								<Icon 
-									style={iconStyle}
-									iconId="user" 
-								/>
-								사용자 관리
-							</NavLink>
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="user" 
+                                />
+								User
+                            </NavLink>
                         </NavItem>
                     </Nav>
                 </div>
                 <div className={styles.SideMenu__menu}>
-                    <span className={`TopMenu ${styles.SideMenu__top}`}> 서비스 운영 관리 </span>
+                    <span className={`TopMenu ${styles.SideMenu__top}`}> Services </span>
                     <Nav vertical>
                         <NavItem>
                             <NavLink href="#">
-								<Icon 
-									style={iconStyle}
-									iconId="course-history" 
-								/>
-								LED 관리
-							</NavLink>
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="course-history" 
+                                />
+								LED
+                            </NavLink>
                         </NavItem>
                     </Nav>
                 </div>
-				<div className={styles.SideMenu__menu}>
-                    <span className={`TopMenu ${styles.SideMenu__top}`}> 데이터 뷰 </span>
+                <div className={styles.SideMenu__menu}>
+                    <span className={`TopMenu ${styles.SideMenu__top}`}> Analysis </span>
                     <Nav vertical>
                         <NavItem>
-                            <NavLink href="/tracking">
-								<Icon 
-									style={iconStyle}
-									iconId="course-history" 
-								/>
-								트래킹 뷰
-							</NavLink>
-                        </NavItem>
-						<NavItem>
                             <NavLink href="/userview">
-								<Icon 
-									style={iconStyle}
-									iconId="course-history" 
-								/>
-								사용자 뷰
-							</NavLink>
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="course-history" 
+                                />
+								Users
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink href="/deviceview">
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="course-history" 
+                                />
+								Device testing
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink href="/accidentview">
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="course-history" 
+                                />
+								Accidents
+                            </NavLink>
                         </NavItem>
                     </Nav>
                 </div>
                 <div className={styles.SideMenu__menu}>
-                    <span className={`TopMenu ${styles.SideMenu__top}`}> 결제 관리 </span>
+                    <span className={`TopMenu ${styles.SideMenu__top}`}> Payment </span>
                     <Nav vertical>
                         <NavItem>
                             <NavLink href="#">
-								<Icon 
-									style={iconStyle}
-									iconId="price" 
-								/>
-								인앱 결제
-							</NavLink>
+                                <Icon 
+                                    style={iconStyle}
+                                    iconId="price" 
+                                />
+								App
+                            </NavLink>
                         </NavItem>
                     </Nav>
                 </div>
-			</div>
-		)
-	}
-	
+            </div>
+        )
+    }
 }

@@ -6,13 +6,13 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 
 // User-define Components
-import pageStyles from '../../Page.scss';
+import pageStyles from '../../../Page.scss';
 import styles from './style.scss';
-import { timeFormatter, getFullUri } from '../../Page';
+import { timeFormatter, getFullUri } from '../../../Page';
 
-import ToolBar from '../../components/common/ToolBar';
-import Icon from '../../components/icons';
-import { ConfirmModal } from '../../pages/components/modal/Modal';
+import ToolBar from '../../../components/common/ToolBar';
+import Icon from '../../../components/icons';
+import { ConfirmModal } from '../../../pages/components/modal/Modal';
 
 // Open-source Components
 import Table from 'rc-table';
@@ -262,6 +262,7 @@ class UserView extends Component {
         const queryObj = {
             // limit: 1,
             // id: "sdong001"
+            limit: 10,
         };
         
         await axios.get(getFullUri(this.apiUri.user, queryObj))

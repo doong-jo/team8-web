@@ -39,6 +39,31 @@ module.exports = {
         res.send(template(initState));
     },
     
+    convertGetMethodQueryString: (req, res, next) => {
+        let viewData = JSON.stringify(req.query);
+        viewData = JSON.parse(viewData);
+        
+        let queryObj = {},
+            optionObj = {};
+        
+        for(const key in viewData) {
+            if( key === 'order'  || key === 'skip' || key === 'limit') {
+                optionObj[key] = JSON.parse(viewData[key]);
+            } else if( key === 'sort' ) {
+                optionObj[key] = viewData[key];
+            }else {
+                try{
+                    queryObj[key] = JSON.parse(viewData[key]);
+                } catch (e) {
+                    queryObj[key] = viewData[key];  
+                }
+            }
+        }
+        
+        req.queryObj = queryObj;
+        req.optionObj = optionObj;
+    },
+    
     convertObjToGetMethod : (queryObj, optionObj, viewData) => {
         for(const key in viewData) {
             if( key === 'order'  || key === 'skip' || key === 'limit') {

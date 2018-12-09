@@ -97,6 +97,13 @@ const mainRouter = require('./routes/index');
 app.use(express.static('public'));
 app.use('/', mainRouter);
 
+app.get('*', (req, res, next) => {
+    return res.status(404).send('404 Not Found');
+});
+
+app.use((err, req, res, next) => {
+    return res.status(err.status || 500).send('Internal Server Error');
+});
 
 http.createServer(app).listen(port1, () => {
     console.log("Express server listening on port " + port1);
