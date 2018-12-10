@@ -89,6 +89,7 @@ class DeviceTestingView extends Component {
             occured_date : JSON.stringify({$gte : timeFormatter(startDate), $lt : timeFormatter(endDate)}),
             sort: "occured_date",
             order: 1,
+            limit: 3000,
         };
         
         console.log("queryObj", queryObj);
