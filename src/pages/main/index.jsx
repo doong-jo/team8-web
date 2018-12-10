@@ -6,6 +6,7 @@ import ToolBar from '../../components/common/ToolBar';
 import { timeFormatter } from '../../page';
 import styles from './style.scss';
 
+//test commit
 class Main extends React.Component {
     constructor(props) {
         super(props);
