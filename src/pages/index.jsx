@@ -1,3 +1,3 @@
-export { default as UserView } from './analysis/userView/index';
-export { default as DeviceTestingView } from './analysis/deviceTestingView/index';
-export { default as AccidentView } from './analysis/accidentView/index';
+export { default as UserView } from './analysis/usermap/index';
+export { default as DeviceTestingView } from './analysis/devicetest/index';
+export { default as AccidentView } from './analysis/accidentmap/index';

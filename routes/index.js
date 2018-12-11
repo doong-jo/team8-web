@@ -20,7 +20,7 @@ router.use('/category', category);
 router.use('/devicetest', devicetest);
 
 // pages
-router.use(['/userview', '/deviceview', '/accidentview'], viewPage);
+router.use(['/analysis/user', '/analysis/devicetest', '/analysis/accident'], viewPage);
 
 // router.get('*', (req, res, next) => {
 //     console.log('index all route!');
