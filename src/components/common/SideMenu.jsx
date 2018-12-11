@@ -44,7 +44,7 @@ export default class SideMenu extends React.Component {
                     <span className={`TopMenu ${styles.SideMenu__top}`}> Analysis </span>
                     <Nav vertical>
                         <NavItem>
-                            <NavLink href="/userview">
+                            <NavLink href="/analysis/user">
                                 <Icon 
                                     style={iconStyle}
                                     iconId="course-history" 
@@ -53,7 +53,7 @@ export default class SideMenu extends React.Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink href="/deviceview">
+                            <NavLink href="/analysis/devicetest">
                                 <Icon 
                                     style={iconStyle}
                                     iconId="course-history" 
@@ -62,7 +62,7 @@ export default class SideMenu extends React.Component {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink href="/accidentview">
+                            <NavLink href="/analysis/accident">
                                 <Icon 
                                     style={iconStyle}
                                     iconId="course-history" 

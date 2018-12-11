@@ -113,7 +113,7 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
             'rgba(137, 232, 20, 1)',
             'rgba(152, 220, 22, 1)',
             'rgba(166, 209, 25, 1)',
-            'rgba(181, 198, 28, 1)',
+            'rgba(181, 198, 28, 1)'
         ],
     };
     
@@ -133,6 +133,20 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
             'rgba(255, 53, 41, 1)'
         ],
     };
+    
+    const warningMarker = [];
+    const dangerMarker = [];
+    
+    props.markerList.forEach(object => {
+        if( !object.hasAlerted ) {
+            warningMarker.push(new google.maps.LatLng(object.position.lat, object.position.lng))
+        } else {
+            dangerMarker.push(new google.maps.LatLng(object.position.lat, object.position.lng))
+        }
+    });
+    
+    console.log("dangerMarker length : ", dangerMarker.length);
+                    
     return (
         <GoogleMap
             defaultZoom={15}
@@ -143,30 +157,21 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
                 position={props.center}
             />
             
-            <HeatmapLayer
-                data={
-                    props.markerList.map(object => {
-                        if( !object.hasAlerted ) {
-                            return new google.maps.LatLng(object.position.lat, object.position.lng)    
-                        }
-                    })
-                }
-                options={warningHeatmapOptions}
-            />
+            { warningMarker.length !== 0 && 
+                <HeatmapLayer
+                    data={warningMarker}
+                    options={warningHeatmapOptions}
+                />
+            }
             
-            <HeatmapLayer
-                data={
-                    props.markerList.map(object => {
-                        if( object.hasAlerted ) {
-                            return new google.maps.LatLng(object.position.lat, object.position.lng)    
-                        }
-                    })
-                }
-                options={dangerHeatmapOptions}
-            />
+            { dangerMarker.length !== 0 &&
+                <HeatmapLayer
+                    data={dangerMarker}
+                    options={dangerHeatmapOptions}
+                />
+            }
         </GoogleMap>
     )
-    
 }));
 
 class AccidentView extends Component {
@@ -327,7 +332,7 @@ class AccidentView extends Component {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                 };
-
+                
                 console.log("get position :", pos);
 
                 this.setState(prevState => ({
@@ -485,8 +490,6 @@ class AccidentView extends Component {
                                                 mapElement={<div style={{ height: '100%' }} />}
                                                 center={this.state.curGoogleMapPos}
                                                 markerList={this.state.accidentData}
-                                                streetViewVisible={this.state.streetViewVisible}
-                                                streetViewVisibleChanged={this.onStreetViewVisibleChanged}
                                             />
                                         </div>
                                     </div>

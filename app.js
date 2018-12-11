@@ -43,7 +43,7 @@ if ('development' == app.get('env')) {
     app.use(errorHandler());
 }
 
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', (err) => {
     console.log(err.stack);
 });
 
@@ -51,7 +51,7 @@ process.on('uncaughtException', function(err) {
 
 var db = mongoose.connection;
 db.on('error', console.error);
-db.once('open', function(){
+db.once('open', () => {
     // CONNECTED TO MONGODB SERVER
     console.log("Connected to mongod server");
 	
@@ -66,10 +66,10 @@ const option = {
     useNewUrlParser: true
 };
 
-mongoose.connect(mongoURI, option).then(function(){
+mongoose.connect(mongoURI, option).then(() => {
     //connected successfully
     console.log('connect successfully');
-}, function(err) {
+}, (err) => {
     //err handle
 });
 

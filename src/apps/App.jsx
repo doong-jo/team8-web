@@ -19,10 +19,10 @@ const App = () =>
                     <SideMenu />
                 </div>
                 <div className={`GlobalMain ${styles.App__globalmain}`}>
-                    <Route exact path="/main" render={() => <Main />} />                
-                    <Route exact path="/userView" render={() => <UserView pageTitle="View of users" />} />
-                    <Route exact path="/deviceView" render={() => <DeviceTestingView pageTitle="View of device (for test)" />} />
-                    <Route exact path="/accidentView" render={() => <AccidentView pageTitle="View of accidents" />} />
+                    <Route exact path="/main" render={() => <Main />} />
+                    <Route exact path="/analysis/user" render={() => <UserView pageTitle="View of users" />} />
+                    <Route exact path="/analysis/devicetest" render={() => <DeviceTestingView pageTitle="View of device (for test)" />} />
+                    <Route exact path="/analysis/accident" render={() => <AccidentView pageTitle="View of accidents" />} />
                 </div>
             </div>
         </div>
