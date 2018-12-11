@@ -16,7 +16,7 @@ export default class SideMenu extends React.Component {
                     <span className={`TopMenu ${styles.SideMenu__top}`}> Users </span>
                     <Nav vertical>
                         <NavItem>
-                            <NavLink href="/user">
+                            <NavLink href="/users/usermanager">
                                 <Icon 
                                     style={iconStyle}
                                     iconId="user" 

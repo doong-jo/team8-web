@@ -25,7 +25,7 @@ import { compose, withProps } from 'recompose';
 
 // Define const
 
-class DeviceTestingView extends Component {
+class DeviceTest extends Component {
     constructor(props) {
         super(props);
         
@@ -287,12 +287,12 @@ class DeviceTestingView extends Component {
     }
 }
 
-DeviceTestingView.defaultProps = {
+DeviceTest.defaultProps = {
     pageTitle: 'no title',
 };
 
-DeviceTestingView.propTypes = {
+DeviceTest.propTypes = {
     pageTitle: PropTypes.string,
 };
 
-export default DeviceTestingView;
+export default DeviceTest;

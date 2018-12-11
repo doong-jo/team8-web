@@ -122,7 +122,7 @@ const MapWithAMarker = withScriptjs(withGoogleMap(props => (
     </GoogleMap>
 )));
 
-class UserView extends Component {
+class UserMap extends Component {
     constructor(props) {
         super(props);
 
@@ -262,6 +262,9 @@ class UserView extends Component {
         const queryObj = {
             // limit: 1,
             // id: "sdong001"
+            email: "sdong001@gmail.com",
+            sort: "name",
+            order: 1,
             limit: 10,
         };
         
@@ -321,7 +324,7 @@ class UserView extends Component {
                     </div>
 
                     <div>
-                        <div className={styles.UserView__googleMap}>
+                        <div className={styles.UserMap__googleMap}>
                             <MapWithAMarker
                                 googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k&v=3.exp&libraries=geometry,places"
                                 loadingElement={<div style={{ height: '100%' }} />}
@@ -335,7 +338,7 @@ class UserView extends Component {
                             />
                         </div>
 
-                        <div className={styles.UserView__dataTable}>
+                        <div className={styles.UserMap__dataTable}>
                             <Table
                                 columns={columns}
                                 data={this.state.userTableData}
@@ -368,12 +371,12 @@ class UserView extends Component {
     }
 }
 
-UserView.defaultProps = {
+UserMap.defaultProps = {
     pageTitle: 'no title',
 };
 
-UserView.propTypes = {
+UserMap.propTypes = {
     pageTitle: PropTypes.string,
 };
 
-export default UserView;
+export default UserMap;
