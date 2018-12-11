@@ -1,9 +1,4 @@
-import React, { Component } from 'react';
-import { Row, Col, Button } from 'reactstrap';
-import * as d3 from 'd3';
-import DashboardCard from './components/DashboardCard';
-import ToolBar from '../../components/common/ToolBar';
-import { timeFormatter } from '../../Page';
+import React from 'react';
 import styles from './style.scss';
 
 class Main extends React.Component {
