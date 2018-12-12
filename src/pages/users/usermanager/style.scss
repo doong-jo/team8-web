@@ -1,6 +1,26 @@
 .UserManager__dataTable {
+    margin: 0 auto;
     margin-top: 100px;
-    margin-left: 200px;
-    margin-right: 200px;
-    border: 2px solid #444444;
+    margin-left: 100px;
+    margin-right: 100px;
+    border: 1px solid #ccc;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.UserManager__dataTable tbody{
+    background: #fff;
+}
+
+
+.UserManager__pagination__wrapper{
+    overflow-x: auto;    
+}
+
+.UserManager__pagination{
+    margin: 30px;
+}
+
+.UserManager__pagination ul{
+    justify-content: center;
 }
