@@ -19,7 +19,7 @@ const App = () =>
                 </div>
                 <div className={`GlobalMain ${styles.App__globalmain}`}>
                     <Route exact path="/main" render={() => <Main />} />
-                    <Route exact path="/users/usermanager" render={() => <UserManager />} />
+                    <Route exact path="/users/usermanager" render={() => <UserManager pageTitle="View of users information" />} />
                     <Route exact path="/analysis/user" render={() => <UserMap pageTitle="View of users" />} />
                     <Route exact path="/analysis/devicetest" render={() => <DeviceTest pageTitle="View of device (for test)" />} />
                     <Route exact path="/analysis/accident" render={() => <AccidentMap pageTitle="View of accidents" />} />

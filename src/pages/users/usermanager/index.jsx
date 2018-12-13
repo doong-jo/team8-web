@@ -6,6 +6,7 @@ import { Pagination, PaginationItem, PaginationLink} from 'reactstrap';
 import 'rc-table/assets/index.css';
 import styles from './style.scss';
 import { getFullUri } from '../../../Page';
+import ToolBar from '../../../components/common/ToolBar';
 
 // Open-source Components
 import Table from 'rc-table';
@@ -53,6 +54,7 @@ class UserManager extends React.Component{
                 },
             ],
             PAGE_COUNT:5,
+            PAGE_SIZE:10,
         };
     
         this.CONST = constants;
@@ -65,11 +67,9 @@ class UserManager extends React.Component{
             userListTableData:[],
             currentPage: 0,
             totalPageCount: 0,
-            pageSize:10,
             startPage:0,
             endPage: this.CONST.PAGE_COUNT-1,
         };
-        console.log(this.state.totalPageCount)
         this.getTotalPageCount();
         this.getUserList();
     }
@@ -82,19 +82,18 @@ class UserManager extends React.Component{
                 totalUserNumber = res.data.length;
                 this.setState(prevState=>({
                     ...prevState,
-                    totalPageCount : Math.ceil(totalUserNumber / this.state.pageSize),
+                    totalPageCount : Math.ceil(totalUserNumber / this.CONST.PAGE_SIZE),
                 }));
             });
     }
     
     
     getUserList(index){//get userlist from db
-        console.log("getUserList...");
         const queryObj = {
             sort: "email",
             order:1,
-            skip:index!==undefined?this.state.pageSize*index:0,
-            limit:this.state.pageSize,
+            skip:index!==undefined?this.CONST.PAGE_SIZE*index:0,
+            limit:this.CONST.PAGE_SIZE,
         };
         
         axios.get(getFullUri(this.apiUri.user,queryObj))
@@ -110,7 +109,7 @@ class UserManager extends React.Component{
                         name: pivot.name,
                         phone: pivot.phone,
                         riding_type: pivot.riding_type,
-                        emergency:pivot.emergency,
+                        emergency:pivot.emergency===undefined?'':pivot.emergency.toString(),
                     };
                 }
                 
@@ -124,7 +123,6 @@ class UserManager extends React.Component{
     
     handleClick(e,index){
         e.preventDefault();
-        console.log(`handleClick>>>index>>>${index}`);
         this.setState(prevState=>({
             ...prevState,
             currentPage: index,
@@ -135,7 +133,6 @@ class UserManager extends React.Component{
     
     handlePreNextClick(e,index){
         e.preventDefault();
-        console.log(`handlePreNextClick>>>index>>>${index}`);
         if(index>this.state.endPage){
             if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
                 this.setState(prevState =>({
@@ -172,6 +169,7 @@ class UserManager extends React.Component{
     render() {
         return(
             <div>
+                <ToolBar title={this.props.pageTitle}/>
                 <Table className={styles.UserManager__dataTable} columns={this.CONST.TABLE_COLUMS} data={this.state.userListTableData} />
                 <div className={styles.UserManager__pagination__wrapper}>
                     <Pagination className={styles.UserManager__pagination}>
