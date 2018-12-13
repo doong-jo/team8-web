@@ -25,7 +25,7 @@ module.exports = {
 	
     getList : (viewReq, option, callback) => {
         let mongoQuery = commonApi.getFindQuery(viewReq, getDefaultProjection, option);
-        
+
         userModel.find(mongoQuery, (data) => {
             callback(data);
         });
@@ -39,5 +39,13 @@ module.exports = {
                 callback(data);
             });
         }
+    },
+    
+    getCount : (viewReq, option, callback) => {
+        let mongoQuery = commonApi.getFindQuery(viewReq, getDefaultProjection, option);
+        
+        userModel.count(mongoQuery,(data) => {
+            callback(data);
+        });
     },
 };
