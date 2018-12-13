@@ -61,6 +61,7 @@ class UserManager extends React.Component{
                 
         this.apiUri = {
             user: '/user',
+            userCount: '/user/count',
         };
         
         this.state = {
@@ -76,13 +77,11 @@ class UserManager extends React.Component{
     
     async getTotalPageCount(){//get total pageCount using total number of users
         const queryObj = {};
-        let totalUserNumber=0;
-        axios.get(getFullUri(this.apiUri.user,queryObj))
+        axios.get(getFullUri(this.apiUri.userCount,queryObj))
             .then((res)=>{
-                totalUserNumber = res.data.length;
                 this.setState(prevState=>({
                     ...prevState,
-                    totalPageCount : Math.ceil(totalUserNumber / this.CONST.PAGE_SIZE),
+                    totalPageCount : Math.ceil(res.data / this.CONST.PAGE_SIZE),
                 }));
             });
     }
@@ -101,7 +100,7 @@ class UserManager extends React.Component{
                 let result = res.data;
                 
                 let newUserListTableData = [];
-                for(var i=0; i<result.length;i++){
+                for(var i=0 ; i<result.length ; i++){
                     const pivot = result[i];
                     newUserListTableData[i]= {
                         key: i,
@@ -109,7 +108,7 @@ class UserManager extends React.Component{
                         name: pivot.name,
                         phone: pivot.phone,
                         riding_type: pivot.riding_type,
-                        emergency:pivot.emergency===undefined?'':pivot.emergency.toString(),
+                        emergency: pivot.emergency===undefined ? '' : pivot.emergency.toString(),
                     };
                 }
                 

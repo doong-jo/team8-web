@@ -47,6 +47,12 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.get('/count', (req, res, next) => {
+    userApi.getCount(req.queryObj, req.optionObj, (data) => {
+        res.json(data);
+    });
+});
+
 router.post('/', (req, res, next) => {
     let query = req.query;
     
