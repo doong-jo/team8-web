@@ -9,7 +9,6 @@ const main = require('./router/main'),
     category = require("./router/category"),
     devicetest = require("./router/devicetest"),
     viewPage = require("./router/viewpage");
-
 router.get('/', (req, res, err) => { res.redirect('/main');});
 router.use('/main', main);
 router.use('/tracking', tracking);
@@ -20,7 +19,7 @@ router.use('/category', category);
 router.use('/devicetest', devicetest);
 
 // pages
-router.use(['/analysis/user', '/analysis/devicetest', '/analysis/accident'], viewPage);
+router.use(['/analysis/user', '/analysis/devicetest', '/analysis/accident', '/users/usermanager'], viewPage);
 
 // router.get('*', (req, res, next) => {
 //     console.log('index all route!');

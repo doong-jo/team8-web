@@ -1,10 +1,9 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { UserView, DeviceTestingView, AccidentView } from '../pages/';
+import { UserMap, DeviceTest, AccidentMap, Main, UserManager } from '../pages/';
 import Header from '../components/common/Header';
 import SideMenu from '../components/common/SideMenu';
 import styles from './App.scss';
-import {Main} from '../pages/';
 
 const App = () =>
     (
@@ -20,9 +19,10 @@ const App = () =>
                 </div>
                 <div className={`GlobalMain ${styles.App__globalmain}`}>
                     <Route exact path="/main" render={() => <Main />} />
-                    <Route exact path="/analysis/user" render={() => <UserView pageTitle="View of users" />} />
-                    <Route exact path="/analysis/devicetest" render={() => <DeviceTestingView pageTitle="View of device (for test)" />} />
-                    <Route exact path="/analysis/accident" render={() => <AccidentView pageTitle="View of accidents" />} />
+                    <Route exact path="/users/usermanager" render={() => <UserManager pageTitle="View of users information" />} />
+                    <Route exact path="/analysis/user" render={() => <UserMap pageTitle="View of users" />} />
+                    <Route exact path="/analysis/devicetest" render={() => <DeviceTest pageTitle="View of device (for test)" />} />
+                    <Route exact path="/analysis/accident" render={() => <AccidentMap pageTitle="View of accidents" />} />
                 </div>
             </div>
         </div>

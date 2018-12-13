@@ -174,7 +174,7 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
     )
 }));
 
-class AccidentView extends Component {
+class AccidentMap extends Component {
     constructor(props) {
         super(props);
         
@@ -459,7 +459,7 @@ class AccidentView extends Component {
                             <Row>
                                 <Col sm="12">
                                     <div>
-                                        <div className={styles.AccidentView__googleMap}>
+                                        <div className={styles.AccidentMap__googleMap}>
                                             <MapWithMarker
                                                 googleMapURL={this.CONST.GOOGLE_MAP_URL}
                                                 loadingElement={<div style={{ height: '100%' }} />}
@@ -482,7 +482,7 @@ class AccidentView extends Component {
                             <Row>
                                 <Col sm="12">
                                     <div>
-                                        <div className={styles.AccidentView__googleMap}>
+                                        <div className={styles.AccidentMap__googleMap}>
                                             <MapWithCircle
                                                 googleMapURL={this.CONST.GOOGLE_MAP_URL}
                                                 loadingElement={<div style={{ height: '100%' }} />}
@@ -518,12 +518,12 @@ class AccidentView extends Component {
     }
 }
 
-AccidentView.defaultProps = {
+AccidentMap.defaultProps = {
     pageTitle: 'no title',
 };
 
-AccidentView.propTypes = {
+AccidentMap.propTypes = {
     pageTitle: PropTypes.string,
 };
 
-export default AccidentView;
+export default AccidentMap;
