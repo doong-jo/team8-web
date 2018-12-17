@@ -78,12 +78,12 @@ class UserManager extends React.Component{
     async getTotalPageCount(){//get total pageCount using total number of users
         const queryObj = {};
         axios.get(getFullUri(this.apiUri.userCount,queryObj))
-            .then((res)=>{
+            .then((res) => {
                 let totalPageCount = Math.ceil(res.data / this.CONST.PAGE_SIZE);
-                this.setState(prevState=>({
+                this.setState(prevState => ({
                     ...prevState,
                     totalPageCount : totalPageCount,
-                    endPage : this.CONST.PAGE_COUNT<totalPageCount ? this.CONST.PAGE_COUNT-1 : Math.max(0,totalPageCount-1),
+                    endPage : this.CONST.PAGE_COUNT < totalPageCount ? this.CONST.PAGE_COUNT-1 : Math.max(0,totalPageCount-1),
                 }));
             });
     }
@@ -93,12 +93,12 @@ class UserManager extends React.Component{
         const queryObj = {
             sort: "email",
             order:1,
-            skip:index!==undefined ? this.CONST.PAGE_SIZE*index : 0,
+            skip:index !== undefined ? this.CONST.PAGE_SIZE*index : 0,
             limit:this.CONST.PAGE_SIZE,
         };
         
         axios.get(getFullUri(this.apiUri.user,queryObj))
-            .then((res)=>{
+            .then((res) => {
                 let result = res.data;
                 
                 let newUserListTableData = [];
@@ -110,51 +110,33 @@ class UserManager extends React.Component{
                         name: pivot.name,
                         phone: pivot.phone,
                         riding_type: pivot.riding_type,
-                        emergency:pivot.emergency===undefined ? '' : pivot.emergency.toString(),
+                        emergency:pivot.emergency === undefined ? '' : pivot.emergency.toString(),
                     };
                 }
                 
-                //page setState
-                if(index===undefined){
+                const setCurrentPage = (startPage, endPage) => {
                     this.setState(prevState => ({
                         ...prevState,
-                        userListTableData: newUserListTableData,
-                    }));    
-                }else if(index>this.state.endPage){
-                    if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
-                        this.setState(prevState =>({
-                            ...prevState,
-                            startPage:index,
-                            endPage: index+this.CONST.PAGE_COUNT-1,
-                            userListTableData: newUserListTableData,
-                            currentPage: index,
-                        }));
-                    }else{
-                        this.setState(prevState =>({
-                            ...prevState,
-                            startPage:index,
-                            endPage: this.state.totalPageCount-1,
-                            userListTableData: newUserListTableData,
-                            currentPage: index, 
-                        }));
-                    }
-                }else if(index<this.state.startPage){
-                    this.setState(prevState => ({
-                        ...prevState,
-                        endPage: parseInt(index/this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1,
-                        startPage:this.state.startPage-this.CONST.PAGE_COUNT,
-                        userListTableData: newUserListTableData,
-                        currentPage: index,
-                    }));    
-                }else{
-                    this.setState(prevState => ({
-                        ...prevState,
-                        userListTableData: newUserListTableData,
-                        currentPage: index,
+                        startPage : startPage !== undefined ? startPage : this.state.startPage,
+                        endPage : endPage !== undefined ? endPage : this.state.endPage,
+                        userListTableData : newUserListTableData,
+                        currentPage : index !== undefined ? index : 0,
                     }));
                 }
+                
+                //page setState
+                if(index>this.state.endPage){
+                    if(index+this.CONST.PAGE_COUNT-1 <= this.state.totalPageCount){
+                        setCurrentPage(index, index+this.CONST.PAGE_COUNT-1);
+                    }else{
+                        setCurrentPage(index, this.state.totalPageCount-1);
+                    }
+                }else if(index<this.state.startPage){
+                    setCurrentPage(this.state.startPage-this.CONST.PAGE_COUNT, parseInt(index / this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1);
+                }else{
+                    setCurrentPage();
+                }
             });
-        
     }
     
     render() {

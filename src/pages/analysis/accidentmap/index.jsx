@@ -7,6 +7,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import queryString from 'querystring';
 const has = require("has");
+import format from 'date-fns/format';
 // User-define Components
 import pageStyles from '../../../Page.scss';
 import styles from './style.scss';
@@ -431,14 +432,14 @@ class AccidentMap extends Component {
                 
                 let accidentArr = [];
                 const accidentDataLength = res.data.length; 
-                const totalPageNum = Math.ceil(accidentDataLength/self.CONST.PAGE_SIZE);
-                const arrayEndIndex = accidentDataLength<self.CONST.PAGE_SIZE ? accidentDataLength : self.CONST.PAGE_SIZE;
+                const totalPageNum = Math.ceil(accidentDataLength / self.CONST.PAGE_SIZE);
+                const arrayEndIndex = accidentDataLength < self.CONST.PAGE_SIZE ? accidentDataLength : self.CONST.PAGE_SIZE;
                 
-                const setStateFunc = () => {
+                const setInitPage = () => {
                     self.setState(prevState => ({
                         ...prevState,
                         startPage : 0,
-                        endPage : self.CONST.PAGE_COUNT<totalPageNum ? self.CONST.PAGE_COUNT-1 : Math.max(0,totalPageNum-1),
+                        endPage : self.CONST.PAGE_COUNT < totalPageNum ? self.CONST.PAGE_COUNT-1 : Math.max(0,totalPageNum-1),
                         currentPage : 0,
                         accidentData : accidentArr,
                         totalPageCount : totalPageNum,
@@ -446,30 +447,31 @@ class AccidentMap extends Component {
                     }));
                 }
                 
-                if(accidentDataLength==0){
-                    setStateFunc();
+                if(accidentDataLength == 0){
+                    setInitPage();
                 }else{
                     res.data.forEach((accident,i) => { 
                         // console.log('data foreach i>>>',i);
-                        const position ={
+                        const position = {
                             lat: accident.position.latitude,
                             lng: accident.position.longitude,
                         };
+
                         makeAddress(position, address => {
                             accidentArr.push({
                                 key: i,
                                 ridingType: accident.riding_type,
-                                hasAlerted: accident.has_alerted+''!=undefined ? accident.has_alerted+'' : '',
+                                hasAlerted: accident.has_alerted+'' != undefined ? accident.has_alerted+'' : '',
                                 position: position,
                                 userId: accident.user_id,
                                 accel: accident.accel,
                                 rollover: accident.rollover,
-                                date: accident.occured_date.replace('T', ' ').replace('Z', ' '),
+                                date: format(accident.occured_date,'YYYY-MM-DD HH:mm:SSS'),
                                 realAddress: address,
                             });
                             
                             if(accidentArr.length == accidentDataLength)
-                                setStateFunc();
+                                setInitPage();
                         });
                     });    
                 }
@@ -478,42 +480,29 @@ class AccidentMap extends Component {
     
     getAccidentTableList(index){//get AccidentTableList from db
         const accidentDataLength = this.state.accidentData.length;
-        const arrayEndIndex = accidentDataLength<(index+1)*this.CONST.PAGE_SIZE ? accidentDataLength: (index+1)*this.CONST.PAGE_SIZE;
+        const arrayEndIndex = accidentDataLength < (index+1)*this.CONST.PAGE_SIZE ? accidentDataLength: (index+1)*this.CONST.PAGE_SIZE;
         
-        if(index>this.state.endPage){
-            if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
-                this.setState(prevState =>({
-                    ...prevState,
-                    startPage:index,
-                    endPage: index+this.CONST.PAGE_COUNT-1,
-                    accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE, arrayEndIndex),
-                    currentPage: index,
-                }));
-            }else{
-                this.setState(prevState =>({
-                    ...prevState,
-                    startPage:index,
-                    endPage: this.state.totalPageCount-1,
-                    accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
-                    currentPage: index, 
-                }));
-            }
-        }else if(index<this.state.startPage){
+        const setCurrentPage = (startPage, endPage) => {
             this.setState(prevState => ({
                 ...prevState,
-                endPage: parseInt(index/this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1,
-                startPage:this.state.startPage-this.CONST.PAGE_COUNT,
-                accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
-                currentPage: index,
-            }));    
-        }else{
-            this.setState(prevState => ({
-                ...prevState,
-                accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
+                startPage : startPage !== undefined ? startPage : this.state.startPage,
+                endPage : endPage !== undefined ? endPage : this.state.endPage,
+                accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE, arrayEndIndex),
                 currentPage: index,
             }));
         }
-    
+        
+        if(index > this.state.endPage){
+            if(index+this.CONST.PAGE_COUNT-1 <= this.state.totalPageCount){
+                setCurrentPage(index, index+this.CONST.PAGE_COUNT-1);
+            }else{
+                setCurrentPage(index, this.state.totalPageCount-1);
+            }
+        }else if(index < this.state.startPage){
+            setCurrentPage(this.state.startPage-this.CONST.PAGE_COUNT, parseInt(index / this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1);
+        }else{
+            setCurrentPage();
+        }
     }
     
     render() {
