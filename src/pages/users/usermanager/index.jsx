@@ -7,12 +7,11 @@ import 'rc-table/assets/index.css';
 import styles from './style.scss';
 import { getFullUri } from '../../../Page';
 import ToolBar from '../../../components/common/ToolBar';
+import TablePagination from '../../components/TablePagination';
 
 // Open-source Components
 import Table from 'rc-table';
 import axios from 'axios';
-
-
 
 class UserManager extends React.Component{
     constructor(props){
@@ -53,8 +52,8 @@ class UserManager extends React.Component{
                     width: 150,
                 },
             ],
-            PAGE_COUNT:5,
-            PAGE_SIZE:10,
+            PAGE_COUNT: 5,
+            PAGE_SIZE: 10,
         };
     
         this.CONST = constants;
@@ -66,11 +65,12 @@ class UserManager extends React.Component{
         
         this.state = {
             userListTableData:[],
-            currentPage: 0,
             totalPageCount: 0,
-            startPage:0,
-            endPage: this.CONST.PAGE_COUNT-1,
+            currentPage: 0,
+            startPage: 0,
+            endPage: 0,
         };
+        
         this.getTotalPageCount();
         this.getUserList();
     }
@@ -79,9 +79,11 @@ class UserManager extends React.Component{
         const queryObj = {};
         axios.get(getFullUri(this.apiUri.userCount,queryObj))
             .then((res)=>{
+                let totalPageCount = Math.ceil(res.data / this.CONST.PAGE_SIZE);
                 this.setState(prevState=>({
                     ...prevState,
-                    totalPageCount : Math.ceil(res.data / this.CONST.PAGE_SIZE),
+                    totalPageCount : totalPageCount,
+                    endPage : this.CONST.PAGE_COUNT<totalPageCount ? this.CONST.PAGE_COUNT-1 : Math.max(0,totalPageCount-1),
                 }));
             });
     }
@@ -91,7 +93,7 @@ class UserManager extends React.Component{
         const queryObj = {
             sort: "email",
             order:1,
-            skip:index!==undefined?this.CONST.PAGE_SIZE*index:0,
+            skip:index!==undefined ? this.CONST.PAGE_SIZE*index : 0,
             limit:this.CONST.PAGE_SIZE,
         };
         
@@ -108,87 +110,67 @@ class UserManager extends React.Component{
                         name: pivot.name,
                         phone: pivot.phone,
                         riding_type: pivot.riding_type,
-                        emergency: pivot.emergency===undefined ? '' : pivot.emergency.toString(),
+                        emergency:pivot.emergency===undefined ? '' : pivot.emergency.toString(),
                     };
                 }
                 
-                this.setState(prevState => ({
-                    ...prevState,
-                    userListTableData: newUserListTableData,
-                }));
+                //page setState
+                if(index===undefined){
+                    this.setState(prevState => ({
+                        ...prevState,
+                        userListTableData: newUserListTableData,
+                    }));    
+                }else if(index>this.state.endPage){
+                    if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
+                        this.setState(prevState =>({
+                            ...prevState,
+                            startPage:index,
+                            endPage: index+this.CONST.PAGE_COUNT-1,
+                            userListTableData: newUserListTableData,
+                            currentPage: index,
+                        }));
+                    }else{
+                        this.setState(prevState =>({
+                            ...prevState,
+                            startPage:index,
+                            endPage: this.state.totalPageCount-1,
+                            userListTableData: newUserListTableData,
+                            currentPage: index, 
+                        }));
+                    }
+                }else if(index<this.state.startPage){
+                    this.setState(prevState => ({
+                        ...prevState,
+                        endPage: parseInt(index/this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1,
+                        startPage:this.state.startPage-this.CONST.PAGE_COUNT,
+                        userListTableData: newUserListTableData,
+                        currentPage: index,
+                    }));    
+                }else{
+                    this.setState(prevState => ({
+                        ...prevState,
+                        userListTableData: newUserListTableData,
+                        currentPage: index,
+                    }));
+                }
             });
         
     }
-    
-    handleClick(e,index){
-        e.preventDefault();
-        this.setState(prevState=>({
-            ...prevState,
-            currentPage: index,
-        }));
-        
-        this.getUserList(index);
-    }
-    
-    handlePreNextClick(e,index){
-        e.preventDefault();
-        if(index>this.state.endPage){
-            if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
-                this.setState(prevState =>({
-                    ...prevState,
-                    startPage:index,
-                    currentPage: index,
-                    endPage: index+this.CONST.PAGE_COUNT-1,
-                }));
-            }else{
-                this.setState(prevState =>({
-                    ...prevState,
-                    startPage:index,
-                    currentPage: index,
-                    endPage: this.state.totalPageCount-1,
-                }));
-            }
-        }else if(index<this.state.startPage){
-            this.setState(prevState => ({
-                ...prevState,
-                endPage: parseInt(index/this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1,
-                startPage:this.state.startPage-this.CONST.PAGE_COUNT,
-                currentPage: index,
-            }));    
-        }else{
-            this.setState(prevState=>({
-                ...prevState,
-                currentPage: index,
-            }));
-        }
-        this.getUserList(index);
-    }
-    
     
     render() {
         return(
             <div>
                 <ToolBar title={this.props.pageTitle}/>
                 <Table className={styles.UserManager__dataTable} columns={this.CONST.TABLE_COLUMS} data={this.state.userListTableData} />
-                <div className={styles.UserManager__pagination__wrapper}>
-                    <Pagination className={styles.UserManager__pagination}>
-                        <PaginationItem disabled={this.state.currentPage<=0}>
-                            <PaginationLink previous href="#"
-                                onClick={e => this.handlePreNextClick(e, this.state.currentPage - 1)}/>
-                        </PaginationItem>
-                        {[...Array(this.state.endPage-this.state.startPage+1)].map((page, i) => 
-                            <PaginationItem active={(i+this.state.startPage) === this.state.currentPage} key={i+this.state.startPage}>
-                                <PaginationLink onClick={e => this.handleClick(e, this.state.startPage+i)} href="#">
-                                    {this.state.startPage + i+1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        )}
-                        <PaginationItem disabled={this.state.currentPage+1 >= this.state.totalPageCount}>
-                            <PaginationLink next href="#"
-                                onClick={e => this.handlePreNextClick(e, this.state.currentPage + 1)}/>
-                        </PaginationItem>
-                    </Pagination>
-                </div>
+                <TablePagination
+                    startPage={this.state.startPage}
+                    endPage={this.state.endPage}
+                    currentPage={this.state.currentPage}
+                    totalPageCount={this.state.totalPageCount}
+                    pageOnClick= {(index) => {
+                        this.getUserList(index);
+                    }}
+                />
             </div>
         );
     }

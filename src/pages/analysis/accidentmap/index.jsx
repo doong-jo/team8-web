@@ -15,6 +15,7 @@ import { timeFormatter, getFullUri } from '../../../Page';
 import ToolBar from '../../../components/common/ToolBar';
 import Icon from '../../../components/icons';
 import { ConfirmModal } from '../../../pages/components/modal/Modal';
+import TablePagination from '../../components/TablePagination';
 
 // Open-source Components
 import Table from 'rc-table';
@@ -54,7 +55,7 @@ const MapWithMarker = withScriptjs(withGoogleMap(props => {
             origin: new google.maps.Point(0, 0),
             // The anchor for this image is the base of the flagpole at (0, 32).
             anchor: new google.maps.Point(16, 32)
-        }
+        };
     };
 
     return (
@@ -86,7 +87,7 @@ const MapWithMarker = withScriptjs(withGoogleMap(props => {
                                     "가속도 : " + object.accel + "\n" +
                                     "기울기 : " + object.rollover + "\n",
                                 type: object.hasAlerted ? "danger" : "warning",
-                                position: object.position,
+                                position: object.realAddress,
                             })}}
                     >
                     </Marker>
@@ -171,7 +172,7 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
                 />
             }
         </GoogleMap>
-    )
+    );
 }));
 
 class AccidentMap extends Component {
@@ -182,10 +183,58 @@ class AccidentMap extends Component {
             DEFAULT_LAT: 37.5634236,
             DEFAULT_LONG : 126.9918384,
             NAME_MARKER_TAB : "Marker",
-            NAME_CIRCLE_TAB : "Circle",
+            NAME_CIRCLE_TAB : "Heat",
             GOOGLE_MAP_URL : "https://maps.googleapis.com/maps/api/js?key=AIzaSyA2frTy4tc-UaInRtQYs3rTZO5QdH3js0k&v=3.exp&libraries=geometry,places,visualization",
             DANGER_ICON : <Icon size="84px" color="#D40404" iconId="exclamation-triangle" />,
             WARNING_ICON : <Icon size="84px" color="#FCCC04" iconId="exclamation-triangle" />,
+            TABLE_COLUMS : [
+                {
+                    title: 'User_id',
+                    dataIndex: 'userId',
+                    key: 'userId',
+                    width: 150,
+                    
+                },
+                {
+                    title: 'Riding_Type',
+                    dataIndex: 'ridingType',
+                    key: 'ridingType',
+                    width: 150,
+                },
+                {
+                    title: 'Has_Alerted',
+                    dataIndex: 'hasAlerted',
+                    key: 'hasAlerted',
+                    width: 150,
+                },
+                {
+                    title: 'Accel',
+                    dataIndex: 'accel',
+                    key:'accel',
+                    width: 150,
+                    
+                },
+                {
+                    title: 'Rollover',
+                    dataIndex: 'rollover',
+                    key:'rollover',
+                    width: 150,
+                },
+                {
+                    title: 'Occured_Date',
+                    dataIndex: 'date',
+                    key: 'date',
+                    width: 150,
+                },
+                {
+                    title: 'Position',
+                    dataIndex: 'realAddress',
+                    key: 'realAddress',
+                    width: 150,
+                },
+            ],
+            PAGE_COUNT: 5,
+            PAGE_SIZE: 5,
         };
         
         this.CONST = constants;
@@ -216,9 +265,15 @@ class AccidentMap extends Component {
             endDate,
             
             accidentData: [],
+            accidentTableData: [],
             
             accidentModalOpen: false,
             accidentUserDataStr: "",
+            
+            totalPageCount: 0,
+            currentPage: 0,
+            startPage: 0,
+            endPage: 0,
         };
 
         this.apiUri = {
@@ -238,9 +293,6 @@ class AccidentMap extends Component {
         this.onAccidentAcceptBtnClicked = this.onAccidentAcceptBtnClicked.bind(this);
     }
 
-    componentDidMount() {
-
-    }
     
     tabToggle(tab) {
         if (this.state.activeTab !== tab) {
@@ -265,7 +317,7 @@ class AccidentMap extends Component {
             startDate : date,
         }));
         
-        this.loadAccidentData(this, date, this.state.endDate)
+        this.loadAccidentData(this, date, this.state.endDate);
     }
     
     onEndDateChangePicker(date) {
@@ -274,8 +326,9 @@ class AccidentMap extends Component {
             endDate : date,
         }));
         
-        this.loadAccidentData(this, this.state.startDate, date)
+        this.loadAccidentData(this, this.state.startDate, date);
     }
+    
     
     onAccidentModalTrigger(data) {
         if( !has(data, "content") ) {
@@ -285,30 +338,13 @@ class AccidentMap extends Component {
             }));
         }
         else {
-            const makeAddress = (position) => {
-                console.log("makeAddress object position : ", position);
-                
-                
-                Geocode.fromLatLng(position.lat, position.lng).then(
-                    response => {
-                        const address = response.results[0].formatted_address;
-                        
-                        this.setState(prevState => ({
-                            ...prevState,
-                            accidentModalOpen: !prevState.accidentModalOpen,
-                            accidentUserDataStr:  data.content + "Address : " + address,
-                            accidentType: data.type === "danger" ? this.CONST.DANGER_ICON : this.CONST.WARNING_ICON,
-                            streetViewPos: data.position,
-                        }));
-                        
-                    },
-                    error => {
-                        console.error(error);
-                    }
-                );
-            };
-    
-            makeAddress(data.position);
+            this.setState(prevState => ({
+                ...prevState,
+                accidentModalOpen: !prevState.accidentModalOpen,
+                accidentUserDataStr:  data.content + "Address : " + data.position,
+                accidentType: data.type === "danger" ? this.CONST.DANGER_ICON : this.CONST.WARNING_ICON,
+                streetViewPos: data.position,
+            }));
         }
     }
     
@@ -321,7 +357,20 @@ class AccidentMap extends Component {
             streetViewVisible: true,
         }));
     }
-
+    
+    async onRowTableClicked(record,index,event){
+        this.onAccidentModalTrigger({ content:
+                                "발생시간 : " + record.date + "\n" +
+                                "유저인덱스 : " + record.userId + "\n" +
+                                "주행타입 : " + record.ridingType + "\n" +
+                                "사고알림여부 : " + record.hasAlerted + "\n" +
+                                "가속도 : " + record.accel + "\n" +
+                                "기울기 : " + record.rollover + "\n",
+        type: record.hasAlerted ? "danger" : "warning",
+        position: record.realAddress,
+        })
+    }
+    
     setCurLocation() {
         console.log("called setCurLocation!");
 
@@ -358,44 +407,113 @@ class AccidentMap extends Component {
         
         let queryObj = {
             occured_date : JSON.stringify({$gte : timeFormatter(startDate), $lt : timeFormatter(endDate)}),
-            // sort: "occured_date",
-            // order: 1,
+            sort: "occured_date",
+            order: -1,
         };
         
         console.log("queryObj", queryObj);
         
+        const makeAddress = (position,callback) => {
+            let address = '';
+            
+            Geocode.fromLatLng(position.lat, position.lng).then(
+                response => {
+                    address = response.results[0].formatted_address;
+                    callback(address);
+                }
+            );
+        };
+
         // queryObj.occured_date = queryString.stringify(queryObj.occured_date);
-        
         
         await axios.get(getFullUri(self.apiUri.accident, queryObj))
             .then((res) => {
                 
-                console.log("res.data", res.data);
-                
                 let accidentArr = [];
+                const accidentDataLength = res.data.length; 
+                const totalPageNum = Math.ceil(accidentDataLength/self.CONST.PAGE_SIZE);
+                const arrayEndIndex = accidentDataLength<self.CONST.PAGE_SIZE ? accidentDataLength : self.CONST.PAGE_SIZE;
                 
-                res.data.forEach(accident => { 
-                    accidentArr.push({
-                        ridingType: accident.riding_type,
-                        hasAlerted: accident.has_alerted,
-                        position: {
+                const setStateFunc = () => {
+                    self.setState(prevState => ({
+                        ...prevState,
+                        startPage : 0,
+                        endPage : self.CONST.PAGE_COUNT<totalPageNum ? self.CONST.PAGE_COUNT-1 : Math.max(0,totalPageNum-1),
+                        currentPage : 0,
+                        accidentData : accidentArr,
+                        totalPageCount : totalPageNum,
+                        accidentTableData: accidentArr.slice(0, arrayEndIndex),
+                    }));
+                }
+                
+                if(accidentDataLength==0){
+                    setStateFunc();
+                }else{
+                    res.data.forEach((accident,i) => { 
+                        // console.log('data foreach i>>>',i);
+                        const position ={
                             lat: accident.position.latitude,
                             lng: accident.position.longitude,
-                        },
-                        userId: accident.user_id,
-                        accel: accident.accel,
-                        rollover: accident.rollover,
-                        date: accident.occured_date,
-                    })
-                });
-                
-                self.setState(prevState => ({
-                    ...prevState,
-                    accidentData : accidentArr
-                }));
-                
-                console.log("accident positions : ", accidentArr);
+                        };
+                        makeAddress(position, address => {
+                            accidentArr.push({
+                                key: i,
+                                ridingType: accident.riding_type,
+                                hasAlerted: accident.has_alerted+''!=undefined ? accident.has_alerted+'' : '',
+                                position: position,
+                                userId: accident.user_id,
+                                accel: accident.accel,
+                                rollover: accident.rollover,
+                                date: accident.occured_date.replace('T', ' ').replace('Z', ' '),
+                                realAddress: address,
+                            });
+                            
+                            if(accidentArr.length == accidentDataLength)
+                                setStateFunc();
+                        });
+                    });    
+                }
             });
+    }
+    
+    getAccidentTableList(index){//get AccidentTableList from db
+        const accidentDataLength = this.state.accidentData.length;
+        const arrayEndIndex = accidentDataLength<(index+1)*this.CONST.PAGE_SIZE ? accidentDataLength: (index+1)*this.CONST.PAGE_SIZE;
+        
+        if(index>this.state.endPage){
+            if(index+this.CONST.PAGE_COUNT-1<=this.state.totalPageCount){
+                this.setState(prevState =>({
+                    ...prevState,
+                    startPage:index,
+                    endPage: index+this.CONST.PAGE_COUNT-1,
+                    accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE, arrayEndIndex),
+                    currentPage: index,
+                }));
+            }else{
+                this.setState(prevState =>({
+                    ...prevState,
+                    startPage:index,
+                    endPage: this.state.totalPageCount-1,
+                    accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
+                    currentPage: index, 
+                }));
+            }
+        }else if(index<this.state.startPage){
+            this.setState(prevState => ({
+                ...prevState,
+                endPage: parseInt(index/this.CONST.PAGE_COUNT)+this.CONST.PAGE_COUNT-1,
+                startPage:this.state.startPage-this.CONST.PAGE_COUNT,
+                accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
+                currentPage: index,
+            }));    
+        }else{
+            this.setState(prevState => ({
+                ...prevState,
+                accidentTableData: this.state.accidentData.slice(index*this.CONST.PAGE_SIZE,arrayEndIndex),
+                currentPage: index,
+            }));
+        }
+    
     }
     
     render() {
@@ -436,6 +554,25 @@ class AccidentMap extends Component {
                             timeIntervals={1}
                         />
                     </div>
+                    <Table
+                        className={styles.AccidentMap__dataTable}
+                        columns={this.CONST.TABLE_COLUMS}
+                        data={this.state.accidentTableData.sort((data1,data2) => {
+                            return data1.key-data2.key
+                        })}
+                        onRow={(record,index) => ({
+                            onClick: this.onRowTableClicked.bind(this,record,index),
+                            onDoubleClick: this.onRowTableClicked.bind(this, record, index),
+                        })} />
+                    <TablePagination
+                        startPage={this.state.startPage}
+                        endPage={this.state.endPage}
+                        currentPage={this.state.currentPage}
+                        totalPageCount={this.state.totalPageCount}
+                        pageOnClick= {(index) => {
+                            this.getAccidentTableList(index);
+                        }}
+                    />    
                     <Nav tabs>
                         <NavItem>
                             <NavLink

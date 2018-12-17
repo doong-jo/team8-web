@@ -11,7 +11,6 @@ import {
     NavLink } from 'reactstrap';
 import NavNotice from '../dropdown/NavNotice';
 import NavUser from '../dropdown/NavUser';
-import SearchInput from './SearchInput';
 import styles from './Header.scss';
 
 

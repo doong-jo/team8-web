@@ -2,3 +2,14 @@
 	float: left;
 	width: 100%;
 }
+
+.AccidentMap__dataTable {
+    margin-top: 30px;
+    margin-bottom: 50px;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+}
+
+.AccidentMap__dataTable tbody{
+    background: #fff;
+}
