@@ -3,13 +3,59 @@
 	width: 100%;
 }
 
+.AccidentMap__chartTableDiv{
+    width: 100%;
+    margin-top: 80px;
+}
+
+.AccidentMap__chartTableDiv div {
+    display: inline-grid;
+    vertical-align: top;
+}    
+
+.AccidentMap__chart__div div {
+    display: block;
+}
+
+.AccidentMap__chart__div {
+    width: 60%;
+    min-width: max-content;
+    justify-content: center;
+}
+
+.AccidentMap__chart__regionDiv {
+    margin-left: 40px;
+    z-index: 1;
+    font-weight: bold;
+}
+
+.AccidentMap__dataTable__div {
+    // float: right;
+    // display: inline-block;
+    width: 30%;
+    // height: 500px;
+}
+
 .AccidentMap__dataTable {
+    float: right;
+    width: auto;
     margin-top: 30px;
     margin-bottom: 50px;
     border: 1px solid #ccc;
     border-collapse: collapse;
 }
 
-.AccidentMap__dataTable tbody{
+.AccidentMap__tablePagination {
+    display: block;
+    float: right;
+}
+
+
+.AccidentMap__dataTable tbody {
     background: #fff;
+}
+
+.AccidentMap__selectBox {
+    width: 150px;
+    margin-left: 20px;
 }

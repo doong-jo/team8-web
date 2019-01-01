@@ -65,6 +65,7 @@ class SelectBox extends Component {
                 searchable={this.searchable}
                 placeholder={this.props.placeholder}
                 disabled={this.props.disabled}
+                changeHandler={this.props.changeHandler}
             />
         );
     }

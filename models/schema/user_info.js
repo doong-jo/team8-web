@@ -18,6 +18,8 @@ const userFields = {
     phone: String,
     riding_type: String,
     emergency: Boolean,
+    acc_enabled: Boolean,
+    acc_level: String,
     lastAccess: Date,
     lastPosition: Object,
     ledIndicies: Array,

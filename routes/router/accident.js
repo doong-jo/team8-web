@@ -46,6 +46,14 @@ router.post('/', (req, res, next) => {
     accidentApi.createAccident(query, (data) => {
         res.json(data);
     });
+    
+//   accidentChartApi.createAccident(query, (data) => {
+//         res.json(data);
+//     });
+    
+//     accidentTableApi.createAccident(query, (data) => {
+//         res.json(data);
+//     });
 });
 
 module.exports = router;
