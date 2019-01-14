@@ -34,4 +34,22 @@ module.exports = {
             callback(data);
         });
     },
+    
+    getListByGte : (viewReq, option, callback) => {
+
+        let mongoQuery = commonApi.getFindQuery(viewReq, getDefaultProjection, option);
+        
+        if( has(mongoQuery.query, 'gte') ) {
+            let convertQuery = mongoQuery.query;
+            console.log('convertQuery >>> ', convertQuery);
+            convertQuery.occured_date = convertQuery.gte;
+            // convertQuery.occured_date.$gte = 
+            delete convertQuery.gte;    
+            mongoQuery.query = convertQuery;
+        }
+        console.log('mongoQuery>>>',mongoQuery.query);
+        accidentModel.find(mongoQuery, (data) => {
+            callback(data);
+        });
+    },
 };

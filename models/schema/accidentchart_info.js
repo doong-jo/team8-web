@@ -11,23 +11,20 @@ const option = {
 
 let mongooseCon = mongoose.createConnection('mongodb://josungdong:01034823161@localhost:25321/admin', option);
 
-const accidentFields = {
-    user_id: String,
+const accidentchartFields = {
+    name: String,
+    type: String,
+    parent: String,
+    occured_dates: Array,
     riding_type: String,
-    occured_date: Date,
-    position: Object,
-    has_alerted: Boolean,
-    accel: Number,
-    rollover: Number,
-    realAddress: String,
 };
 
-const accidentSchema = new schema(accidentFields, { collection: 'accident', bufferCommands: false }),
+const accidentSchema = new schema(accidentchartFields, { collection: 'accidentchart', bufferCommands: false }),
     db = {
-        accident: mongooseCon.model('accident', accidentSchema),
+        accidentchart: mongooseCon.model('accidentchart', accidentSchema),
     };
 
 module.exports = {
     getDB: () => db,
-    getFields: () => accidentFields
+    getFields: () => accidentchartFields
 };

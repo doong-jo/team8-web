@@ -54,7 +54,7 @@ router.get('/regex/', (req, res, next) => {
     let queryObj = {},
         optionObj = {};
     
-    commonApi.convertObjToGetMethodRegex(queryObj, optionObj, viewData);
+    commonApi.convertObjToGetMethod(queryObj, optionObj, viewData);
     // commonApi.convertObjToGetMethod(queryObj, optionObj, viewData);
     
     req.queryObj = queryObj;

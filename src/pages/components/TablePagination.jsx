@@ -22,7 +22,6 @@ class TablePagination extends Component {
     }
     
     render() {
-        console.log(this.props);
         return (
             <Pagination className={[this.props.className, styles.TablePagination].join(' ')}>
                 <PaginationItem disabled={this.props.currentPage<=0}>

@@ -51,7 +51,7 @@ module.exports = {
                 optionObj[key] = JSON.parse(viewData[key]);
             } else if( key === 'sort' ) {
                 optionObj[key] = viewData[key];
-            }else {
+            } else {
                 try{
                     queryObj[key] = JSON.parse(viewData[key]);
                 } catch (e) {
@@ -70,7 +70,11 @@ module.exports = {
                 optionObj[key] = JSON.parse(viewData[key]);
             } else if( key === 'sort' ) {
                 optionObj[key] = viewData[key];
-            }else {
+            } else if( key === 'regex') {
+                queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
+            } else if( key === 'gte') {
+                queryObj[key] = {$gte: new Date(viewData[key])}
+            } else{
                 try{
                     queryObj[key] = JSON.parse(viewData[key]);
                 } catch (e) {
@@ -80,17 +84,29 @@ module.exports = {
         }
     },
     
-    convertObjToGetMethodRegex : (queryObj, optionObj, viewData) => {
-        for(const key in viewData) {
-            if( key === 'order'  || key === 'skip' || key === 'limit') {
-                optionObj[key] = JSON.parse(viewData[key]);
-            } else if( key === 'sort' ) {
-                optionObj[key] = viewData[key];
-            }else {
-                queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
-            }
-        }
-    },
+    // convertObjToGetMethodRegex : (queryObj, optionObj, viewData) => {
+    //     for(const key in viewData) {
+    //         if( key === 'order'  || key === 'skip' || key === 'limit') {
+    //             optionObj[key] = JSON.parse(viewData[key]);
+    //         } else if( key === 'sort' ) {
+    //             optionObj[key] = viewData[key];
+    //         } else {
+    //             queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
+    //         }
+    //     }
+    // },
+    // convertObjToGetMethodGte : (queryObj, optionObj, viewData) => {
+    //     for(const key in viewData) {
+    //         if( key === 'order'  || key === 'skip' || key === 'limit') {
+    //             optionObj[key] = JSON.parse(viewData[key]);
+    //         } else if( key === 'sort' ) {
+    //             optionObj[key] = viewData[key];
+    //         } else {
+    //             queryObj[key] = {$gte: new Date(viewData[key])}
+    //         }
+    //     }
+    // }
+    // ,
     
     getFindQuery : (query, projection, option) => {
         if(option === undefined ) {
@@ -119,11 +135,12 @@ module.exports = {
         let mongoQuery = {
             query : {},
             updateQuery : {},
+            upsert: {upsert: true}
         };
         
         mongoQuery.query = Object.assign(queryObj.query);
         mongoQuery.updateQuery = Object.assign(queryObj.updateQuery);
-        
+        console.log('mongoQuery >>>', mongoQuery)
         return mongoQuery;
     },
 };

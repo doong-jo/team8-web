@@ -10,9 +10,8 @@ class SelectBox extends Component {
     constructor(props) {
         super(props);
         this.updateValue = this.updateValue.bind(this);
-
         this.state = {
-            selectValue: '',
+            selectValue: this.props.defaultValue === undefined ? '' : this.props.defaultValue ,
         };
 
         this.clearable = false;
