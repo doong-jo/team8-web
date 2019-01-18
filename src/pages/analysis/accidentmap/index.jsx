@@ -49,8 +49,6 @@ const getPixelPositionOffset = (width, height) => ({
 })
 
 const MapWithMarker = withScriptjs(withGoogleMap(props => {
-    // const baseURL = 
-    console.log('MapWithMarker props >>>', props);
     const markerImage = (hasAlerted, type) => {
         return {
             url: hasAlerted ? "http://175.123.140.145:88/images/danger_" + type + ".png" : "http://175.123.140.145:88/images/warning_" + type + ".png",
@@ -68,6 +66,7 @@ const MapWithMarker = withScriptjs(withGoogleMap(props => {
             ref={props.onMapMounted}
             defaultZoom={15}
             defaultCenter={props.center}
+            zoom={props.zoom}
             center={props.center}
             onBoundsChanged={props.onBoundsChanged}
             // onDragEnd={props.onDragEnd}
@@ -117,7 +116,6 @@ const MapWithMarker = withScriptjs(withGoogleMap(props => {
 }));
 
 const MapWithCircle = withScriptjs(withGoogleMap(props => {
-    console.log('MapWithCircle props >>>', props);
     const warningHeatmapOptions = {
         'gradient': [
             'rgba(108, 255, 15, 0)',
@@ -148,7 +146,7 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
     
     const warningMarker = [];
     const dangerMarker = [];
-    // console.log('MapWithCircle center >>> ', new google.maps.LatLngBounds().getCenter());
+
     props.markerList.forEach(object => {
         if( !object.hasAlerted ) {
             warningMarker.push(new google.maps.LatLng(object.position.lat, object.position.lng))
@@ -156,16 +154,13 @@ const MapWithCircle = withScriptjs(withGoogleMap(props => {
             dangerMarker.push(new google.maps.LatLng(object.position.lat, object.position.lng))
         }
     });
-    // let ref;
-    console.log("dangerMarker length : ", dangerMarker.length);
-    // if(props.tabName === 'Heat') {
-    // ref = props.onMapMounted
-    // }
+
     return (
         <GoogleMap
             ref={props.onMapMounted}
             defaultZoom={15}
             defaultCenter={props.center}
+            zoom={props.zoom}
             center={props.center} // props.center
             onBoundsChanged={props.onBoundsChanged}
         >
@@ -337,7 +332,7 @@ class AccidentMap extends Component {
             
             accidentModalOpen: false,
             accidentUserDataStr: "",
-            
+            curZoom: 15,
             totalPageCount: 0,
             currentPage: 0,
             startPage: 0,
@@ -380,7 +375,7 @@ class AccidentMap extends Component {
                 (curBounds.latLeft < accident.position.lat && accident.position.lat < curBounds.latRight);
             });
         }
-        
+
         this.setState(prevState => ({
             ...prevState,
             accidentFilterData: accidentDataArr,
@@ -392,17 +387,16 @@ class AccidentMap extends Component {
     
     tabToggle(tab) {
         if (this.state.activeTab !== tab) {
+            const changeZoom = this.googleMap[this.state.activeTab].getZoom();
             this.googleMap[tab].panTo({lat: this.googleMap[this.state.activeTab].getCenter().lat(), lng: this.googleMap[this.state.activeTab].getCenter().lng()});
-            
             this.setState({
                 activeTab: tab,
+                curZoom: changeZoom,
             });
         }
     }
 
     onStreetViewVisibleChanged() {
-        console.log('called onStreetViewVisibleChanged! ');
-
         this.setState(prevState => ({
             ...prevState,
             streetViewVisible: !prevState.streetViewVisible,
@@ -431,7 +425,6 @@ class AccidentMap extends Component {
     
     
     onAccidentModalTrigger(data) {
-        console.log('trigger >>> ', data);
         if( !has(data, "content") ) {
             this.setState(prevState => ({
                 ...prevState,
@@ -450,8 +443,6 @@ class AccidentMap extends Component {
     }
     
     onAccidentAcceptBtnClicked() {
-        console.log('called onAccidentAcceptBtnClicked!');
-        
         this.setState(prevState => ({
             ...prevState,
             accidentModalOpen: !prevState.accidentModalOpen,
@@ -513,17 +504,13 @@ class AccidentMap extends Component {
     }
 
     setCurLocation() {
-        console.log("called setCurLocation!");
-
         if (navigator.geolocation) {
-            console.log("is geolocation!");
             navigator.geolocation.getCurrentPosition((position) => {
                 const pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                 };
                 
-                console.log("get position :", pos);
                 this.setState(prevState => ({
                     ...prevState,
                     curGoogleMapPos: pos,
@@ -532,13 +519,10 @@ class AccidentMap extends Component {
                 return pos;
             }, (error) => {
                 console.log("handleLocationError Geolocation: ", error);
-                // handleLocationError(true, infoWindow, map.getCenter());
             });
         }
         else {
             console.log("Browser doesn't support Geolocation");
-            // Browser doesn't support Geolocation
-            // handleLocationError(false, infoWindow, map.getCenter());
         }
     }
     
@@ -547,9 +531,9 @@ class AccidentMap extends Component {
             lineChartDic = {},
             lineStartDate = new Date();
 
-        if(this.state.selectPeriod == 'week') {
+        if(this.state.selectPeriod == this.CONST.LINE_CHART_WEEK) {
             lineStartDate.setDate(endDate.getDate()-7);
-        }else if(this.state.selectPeriod == 'month') {
+        }else if(this.state.selectPeriod == this.CONST.LINE_CHART_MONTH) {
             lineStartDate.setMonth(endDate.getMonth()-1);
         }else {
             lineStartDate.setYear(endDate.getFullYear()-1);
@@ -685,8 +669,6 @@ class AccidentMap extends Component {
     }
     
     async loadAccidentData(self, startDate, endDate) {
-        console.log("Update accidentData!");
-        
         let queryObj = {
             occured_date : JSON.stringify({$gte : timeFormatter(startDate), $lt : timeFormatter(endDate)}),
             sort: "occured_date",
@@ -695,7 +677,6 @@ class AccidentMap extends Component {
             // limit: 10,
         };
         
-        console.log("queryObj", queryObj);
 
         await axios.get(getFullUri(self.apiUri.accident, queryObj))
             .then((res) => {
@@ -917,12 +898,12 @@ class AccidentMap extends Component {
                                                 onMapMounted={this.state.onMapWithMarkerMounted}
                                                 onBoundsChanged={
                                                     debounce(300, false, () => {
-                                                        console.log('debounce...');
                                                         if(this.isNotInit) {
                                                             this.setFilteredData();
                                                         }
                                                     })
                                                 }
+                                                zoom={this.state.curZoom}
                                                 loadingElement={<div style={{ height: '100%' }} />}
                                                 containerElement={<div style={{ height: '700px' }} />}
                                                 mapElement={<div style={{ height: '100%' }} />}
@@ -948,12 +929,12 @@ class AccidentMap extends Component {
                                                 onMapMounted={this.state.onMapWithCircleMounted}
                                                 onBoundsChanged={
                                                     debounce(300, false, () => {
-                                                        console.log('debounce...');
                                                         if(this.isNotInit) {
                                                             this.setFilteredData();
                                                         }
                                                     })
                                                 }
+                                                zoom={this.state.curZoom}
                                                 googleMapURL={this.CONST.GOOGLE_MAP_URL}
                                                 loadingElement={<div style={{ height: '100%' }} />}
                                                 containerElement={<div style={{ height: '700px' }} />}

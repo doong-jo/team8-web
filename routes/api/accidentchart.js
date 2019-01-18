@@ -49,14 +49,6 @@ module.exports = {
         });
     },
     
-    checkDocExist: (query, option, callback) => {
-        let mongoQuery = commonApi.getFindQuery(query, {_id:1}, option);
-        
-        accidentchartModel.find(mongoQuery,(data) => {
-            callback(data);
-        });
-    },
-    
     updateChartData : (query, callback) => {
         let queryArrForChart = [];
         if( has(query, 'realAddress')){
@@ -65,24 +57,28 @@ module.exports = {
             const queryForEach = (queryArr) => {
                 queryArr.forEach((queryForChart, index) => {
                     const mongoFindQuery = commonApi.getFindQuery(queryForChart.query, getDefaultProjection);
-                    accidentchartModel.count(mongoFindQuery, (count) => {
-                        console.log("chartdata count >>> ",count);
+
+                    let finishTrans = 0;
+
+                    accidentchartModel.count(mongoFindQuery, (count, err) => {
                         let mongoUpdateQuery = commonApi.getUpdateQuery(queryForChart);
 
                         if(count > 0) {
                             mongoUpdateQuery.updateQuery.$push = {};
                             mongoUpdateQuery.updateQuery.$push.occured_dates = query.occured_date;
                             accidentchartModel.updateOne(mongoUpdateQuery, (data) => {
-                                console.log('accidentChart update>>>', data);
                             });
                         } else if(count != -1){
                             mongoUpdateQuery.query.occured_dates = query.occured_date;
                             accidentchartModel.insert(mongoUpdateQuery.query, (data) => {
-                                console.log('accidentChart insert>>>', data);
                             });
                         }
-                        if(queryArr.length == index+1)
+
+                        if(queryArr.length == finishTrans+1) {
                             callback(true);
+                        }
+
+                        finishTrans++;
                     });
                 });
             };
@@ -97,6 +93,7 @@ module.exports = {
                     riding_type: query.riding_type,
                 };
                 queryArrForChart.push(queryForChart);
+
                 if(queryArrForChart.length == addressArr.length){
                     queryForEach(queryArrForChart);
                 }
@@ -106,7 +103,6 @@ module.exports = {
     getRealAddress: (position, callback) => {
         const geocoder = NodeGeocoder(options);
         geocoder.reverse({lat: position.latitude, lon: position.longitude}, (err,res) => {
-            console.log('geocoder.reverse >>> res', res);
             if(res !== undefined){
                 callback(res[0].formattedAddress);    
             }else {
