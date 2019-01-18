@@ -4,12 +4,12 @@ import styles from './style.scss';
 class Main extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-        };
     }
+    
     componentDidMount() {
-        // Member, Project, Errors ajax call and set state.
+        
     }
+    
     render() {
         return (
             <div className={styles.Main__content}>
