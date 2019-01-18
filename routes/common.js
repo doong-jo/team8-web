@@ -39,38 +39,17 @@ module.exports = {
         res.send(template(initState));
     },
     
-    convertGetMethodQueryString: (req, res, next) => {
-        let viewData = JSON.stringify(req.query);
-        viewData = JSON.parse(viewData);
-        
-        let queryObj = {},
-            optionObj = {};
-        
-        for(const key in viewData) {
-            if( key === 'order'  || key === 'skip' || key === 'limit') {
-                optionObj[key] = JSON.parse(viewData[key]);
-            } else if( key === 'sort' ) {
-                optionObj[key] = viewData[key];
-            }else {
-                try{
-                    queryObj[key] = JSON.parse(viewData[key]);
-                } catch (e) {
-                    queryObj[key] = viewData[key];  
-                }
-            }
-        }
-        
-        req.queryObj = queryObj;
-        req.optionObj = optionObj;
-    },
-    
     convertObjToGetMethod : (queryObj, optionObj, viewData) => {
         for(const key in viewData) {
             if( key === 'order'  || key === 'skip' || key === 'limit') {
                 optionObj[key] = JSON.parse(viewData[key]);
             } else if( key === 'sort' ) {
                 optionObj[key] = viewData[key];
-            }else {
+            } else if( key === 'regex') {
+                queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
+            } else if( key === 'gte') {
+                queryObj[key] = {$gte: new Date(viewData[key])}
+            } else{
                 try{
                     queryObj[key] = JSON.parse(viewData[key]);
                 } catch (e) {
@@ -80,17 +59,17 @@ module.exports = {
         }
     },
     
-    convertObjToGetMethodRegex : (queryObj, optionObj, viewData) => {
-        for(const key in viewData) {
-            if( key === 'order'  || key === 'skip' || key === 'limit') {
-                optionObj[key] = JSON.parse(viewData[key]);
-            } else if( key === 'sort' ) {
-                optionObj[key] = viewData[key];
-            }else {
-                queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
-            }
-        }
-    },
+    // convertObjToGetMethodRegex : (queryObj, optionObj, viewData) => {
+    //     for(const key in viewData) {
+    //         if( key === 'order'  || key === 'skip' || key === 'limit') {
+    //             optionObj[key] = JSON.parse(viewData[key]);
+    //         } else if( key === 'sort' ) {
+    //             optionObj[key] = viewData[key];
+    //         } else {
+    //             queryObj[key] = {$regex: new RegExp(viewData[key]), $options:"i"}
+    //         }
+    //     }
+    // },
     
     getFindQuery : (query, projection, option) => {
         if(option === undefined ) {
@@ -119,11 +98,11 @@ module.exports = {
         let mongoQuery = {
             query : {},
             updateQuery : {},
+            upsert: {upsert: true}
         };
         
         mongoQuery.query = Object.assign(queryObj.query);
         mongoQuery.updateQuery = Object.assign(queryObj.updateQuery);
-        
         return mongoQuery;
     },
 };

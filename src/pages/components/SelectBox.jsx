@@ -10,9 +10,8 @@ class SelectBox extends Component {
     constructor(props) {
         super(props);
         this.updateValue = this.updateValue.bind(this);
-
         this.state = {
-            selectValue: '',
+            selectValue: this.props.defaultValue === undefined ? '' : this.props.defaultValue ,
         };
 
         this.clearable = false;
@@ -65,6 +64,7 @@ class SelectBox extends Component {
                 searchable={this.searchable}
                 placeholder={this.props.placeholder}
                 disabled={this.props.disabled}
+                changeHandler={this.props.changeHandler}
             />
         );
     }

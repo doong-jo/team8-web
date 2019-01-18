@@ -5,7 +5,7 @@ const has = require('has');
 const commonApi = require('../common');
 
 router.get('/', (req, res, next) => {
-    commonApi.convertGetMethodQueryString(req, res, next);
+    commonApi.convertObjToGetMethod(req, res, next);
     
     const jsonTemplateData = {
         // userName : req.__user.name

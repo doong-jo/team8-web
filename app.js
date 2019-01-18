@@ -109,9 +109,9 @@ http.createServer(app).listen(port1, () => {
     console.log("Express server listening on port " + port1);
 });
 
-// https.createServer(SSLoptions, app).listen(port2, () => {
-//     console.log("Express server listening on port " + port2);
-// });
+https.createServer(SSLoptions, app).listen(port2, () => {
+    console.log("Express server listening on port " + port2);
+});
 /*----------------------------------------------------------------------------*/
 
 /*--------------------------------EXECUTE-------------------------------------*/

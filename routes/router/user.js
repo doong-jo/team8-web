@@ -9,9 +9,12 @@ const commonApi = require('../common');
 
 const formValidation = (query) => {
     
-    if( has(query, 'lastAccess') ) {
-        query.lastAccess = new Date(query.startAt);
-        query.lastAccess.setHours(query.startAt.getHours() - 9);
+    // if( has(query, 'lastAccess') ) {
+    //     query.lastAccess = new Date(query.startAt);
+    //     query.lastAccess.setHours(query.startAt.getHours() - 9);
+    // }
+    if( has(query, 'acc_enabled') ) {
+        query.acc_enabled = JSON.parse(query.acc_enabled);
     }
 };
 
@@ -56,7 +59,7 @@ router.get('/count', (req, res, next) => {
 router.post('/', (req, res, next) => {
     let query = req.query;
     
-    //formValidation(query);
+    formValidation(query);
     
     console.log(query);
     

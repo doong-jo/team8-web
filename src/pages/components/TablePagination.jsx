@@ -22,9 +22,8 @@ class TablePagination extends Component {
     }
     
     render() {
-        console.log(this.props);
         return (
-            <Pagination className={styles.TablePagination}>
+            <Pagination className={[this.props.className, styles.TablePagination].join(' ')}>
                 <PaginationItem disabled={this.props.currentPage<=0}>
                     <PaginationLink previous href="#"
                         onClick={e => this.handlePreNextClick(e, this.props.currentPage - 1)}/>

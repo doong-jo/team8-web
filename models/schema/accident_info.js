@@ -19,6 +19,7 @@ const accidentFields = {
     has_alerted: Boolean,
     accel: Number,
     rollover: Number,
+    realAddress: String,
 };
 
 const accidentSchema = new schema(accidentFields, { collection: 'accident', bufferCommands: false }),

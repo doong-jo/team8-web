@@ -23,33 +23,45 @@ class UserManager extends React.Component{
                     title: 'Email',
                     dataIndex: 'email',
                     key:'email',
-                    width: 150,
+                    width: '20%',
                     
                 },
                 {
                     title: 'Name',
                     dataIndex: 'name',
                     key:'name',
-                    width: 150,
+                    width: '10%',
                 },
                 {
                     title: 'Phone',
                     dataIndex: 'phone',
                     key:'phone',
-                    width: 150,
+                    width: '20%',
                     
                 },
                 {
                     title: 'Riding_Type',
                     dataIndex: 'riding_type',
                     key:'riding_type',
-                    width: 150,
+                    width: '15%',
+                },
+                {
+                    title: 'Acc_Enabled',
+                    dataIndex: 'acc_enabled',
+                    key:'acc_enabled',
+                    width: '10%',
+                },
+                {
+                    title: 'Acc_Level',
+                    dataIndex: 'acc_level',
+                    key:'acc_level',
+                    width: '10%',
                 },
                 {
                     title: 'Emergency',
                     dataIndex: 'emergency',
                     key:'emergency',
-                    width: 150,
+                    width: '15%',
                 },
             ],
             PAGE_COUNT: 5,
@@ -104,14 +116,16 @@ class UserManager extends React.Component{
                 let newUserListTableData = [];
                 for(var i=0 ; i<result.length ; i++){
                     const pivot = result[i];
-                    newUserListTableData[i]= {
+                    newUserListTableData.push({
                         key: i,
                         email: pivot.email,
                         name: pivot.name,
                         phone: pivot.phone,
                         riding_type: pivot.riding_type,
+                        acc_enabled: pivot.acc_enabled,
+                        acc_level: pivot.acc_level,
                         emergency:pivot.emergency === undefined ? '' : pivot.emergency.toString(),
-                    };
+                    });
                 }
                 
                 const setCurrentPage = (startPage, endPage) => {
