@@ -95,18 +95,6 @@ module.exports = {
     //         }
     //     }
     // },
-    // convertObjToGetMethodGte : (queryObj, optionObj, viewData) => {
-    //     for(const key in viewData) {
-    //         if( key === 'order'  || key === 'skip' || key === 'limit') {
-    //             optionObj[key] = JSON.parse(viewData[key]);
-    //         } else if( key === 'sort' ) {
-    //             optionObj[key] = viewData[key];
-    //         } else {
-    //             queryObj[key] = {$gte: new Date(viewData[key])}
-    //         }
-    //     }
-    // }
-    // ,
     
     getFindQuery : (query, projection, option) => {
         if(option === undefined ) {
@@ -140,7 +128,6 @@ module.exports = {
         
         mongoQuery.query = Object.assign(queryObj.query);
         mongoQuery.updateQuery = Object.assign(queryObj.updateQuery);
-        console.log('mongoQuery >>>', mongoQuery)
         return mongoQuery;
     },
 };

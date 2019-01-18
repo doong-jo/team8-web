@@ -55,7 +55,12 @@
     background: #fff;
 }
 
-.AccidentMap__selectBox {
+.AccidentMap__selectBox__ridingType {
     width: 150px;
     margin-left: 20px;
+}
+
+.AccidentMap__selectBox__lineChart {
+    width: 150px;
+    margin-bottom: 10px;
 }

@@ -41,5 +41,15 @@ module.exports = {
             }
         });
     },
-    
+    count : function(commandObj, callback) {
+        db.accidentchart.find(commandObj.query, commandObj.projection).countDocuments(function (err, count) {
+            if (err) {
+                console.log('accidentchart.js:count fail', err);
+                callback(-1);
+            }
+            else {
+                callback(count);
+            }
+        });
+    },
 };

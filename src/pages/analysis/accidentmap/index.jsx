@@ -246,16 +246,41 @@ class AccidentMap extends Component {
                 {
                     eventName : 'select',
                     callback  : ({chartWrapper}) => { 
-                        this.onChartSelectHandler(chartWrapper)
+                        this.onChartSelectHandler(chartWrapper);
                     }
                 }
             ],
-            PIE_REGION:['country', 'sido', 'sigungu', 'dong', 'ubmyun', 'ri', 'bunji'],
-            SELECTBOX_OPTIONS: [
+            PIE_REGION: ['country', 'sido', 'sigungu', 'dong', 'ubmyun', 'ri', 'bunji'],
+            LINE_CHART_WEEK: "week",
+            LINE_CHART_MONTH: "month",
+            LINE_CHART_YEAR: "year",
+            LINE_OPTIONS: {
+                series: {
+                    0: {
+                        axis: 'Frequency',
+                        color: 'green',
+                        curveType: 'function',
+                        
+                    },
+                },
+                axes: {
+                    y: {
+                        Frequency: {
+                            label: 'frequency',
+                        },
+                    },
+                },
+            },
+            SELECTBOX_RIDING_TYPE_OPTIONS: [
                 { value: 'all', label: 'All'},
                 { value: 'bicycle', label: 'Bicycle' },
                 { value: 'motorcycle', label: 'Motorcycle' },
                 { value: 'smart_mobility', label: 'Smart_Mobility'},
+            ],
+            SELECTBOX_PERIOD_OPTIONS: [
+                { value: 'week', label: 'Within 7days'},
+                { value: 'month', label: 'Within a month'},
+                { value: 'year', label: 'Within an year'},
             ],
         };
         
@@ -263,8 +288,6 @@ class AccidentMap extends Component {
         
         
         this.googleMap = {};
-        // this.googleMarkerMap;
-        // this.googleHeatMap;
     
         let endDate = new Date();
         
@@ -288,30 +311,16 @@ class AccidentMap extends Component {
             
             streetViewVisible: false,
             
-            // onMapMounted: ref => {
-            //     this.googleMap = ref;
-            //     // console.log('onMapMounted googleMap', this.googleMap.getBounds());
-            // },
+            selectPeriod: "week",
+            lineData: [
+                [{type: 'date', label: 'period'},'frequency count',],
+            ],
             onMapWithMarkerMounted: ref => {
-                // this.googleMarkerMap = ref;
                 this.googleMap.Marker = ref;
             },
             onMapWithCircleMounted: ref => {
-                // this.googleHeatMap = ref;
                 this.googleMap.Heat = ref;
             },
-            // onZoomChanged: () => {
-            //     console.log(this.googleMap.getBounds());
-            //     // this.setAccidentData(this.googleMap.getBounds());
-            // },
-            // onBoundsChanged: () => {
-                
-            // },
-            // onDragEnd: () => {
-            //     console.log("onDragEnd", this.googleMap.getCenter());
-            //     // this.setAccidentData(this.googleMap.getBounds());
-            // },
-            // ,
             mapPosition:{},
             mapBounds:{},
             startDate,
@@ -324,7 +333,6 @@ class AccidentMap extends Component {
             chartData: [],
             regionData: {},
             currentRegion: ["대한민국"],
-            // currentRegionIndex: 0,
             selectRidingType: "all",
             
             accidentModalOpen: false,
@@ -343,6 +351,7 @@ class AccidentMap extends Component {
         
         
         // this.loadAccidentData(this, this.state.startDate, this.state.endDate);
+        this.loadLineChartData(this, this.state.endDate);
         this.loadChartData(this, this.state.startDate, this.state.endDate);
         this.setCurLocation = this.setCurLocation.bind(this);
         this.setCurLocation();
@@ -353,68 +362,40 @@ class AccidentMap extends Component {
         this.onEndDateChangePicker = this.onEndDateChangePicker.bind(this);
         this.onAccidentModalTrigger = this.onAccidentModalTrigger.bind(this);
         this.onAccidentAcceptBtnClicked = this.onAccidentAcceptBtnClicked.bind(this);
-        // this.onFilterDataHandler = this.onFilterDataHandler.bind(this)
     }
     
-    // onFilterDataHandler() {
-    //     // 
-    //     // }
-    // }
-    
     setFilteredData() {
-        console.log('bounds change...');
-        console.log('activeTab>>>', this.state.activeTab );
-        const bounds = this.googleMap[this.state.activeTab].getBounds();
-        // const bounds = this.state.activeTab =='Marker' ? this.googleMarkerMap.getBounds() : this.googleHeatMap.getBounds();
         
-        const curBounds = {
-            lngLeft: bounds.fa.j,
-            lngRight: bounds.fa.l,
-            latLeft: bounds.ma.j,
-            latRight: bounds.ma.l,
-        };
-        
-        // console.log('curBounds>>>', curBounds);
-        
-        const accidentDataArr = this.state.accidentData.filter(accident => {
-            // console.log('accident lng>>>', accident.position.lng, '  accident lat>>>', accident.position.lat);
-            return (curBounds.lngLeft < accident.position.lng && accident.position.lng < curBounds.lngRight) &&
-            (curBounds.latLeft < accident.position.lat && accident.position.lat < curBounds.latRight);
-        });
-        
-        // this.state.accidentData.filter(accident => {
-        //     console.log('accident lng >>>'+ accident.position.lng + 'accident lat' + accident.position.lat);
-        //     (curBounds.lngLeft < accident.position.lng < curBounds.lngRight) || (curBounds.latLeft < accident.position.lat < curBounds.latRight);
-        // })
-        
-        console.log('original accidentData length', this.state.accidentData.length);
-        console.log('filtered accidentData', accidentDataArr);
+        let accidentDataArr = [];
+        if(this.googleMap[this.state.activeTab] !== undefined){
+            const bounds = this.googleMap[this.state.activeTab].getBounds();
+            const curBounds = {
+                lngLeft: bounds.ga.j,
+                lngRight: bounds.ga.l,
+                latLeft: bounds.ma.j,
+                latRight: bounds.ma.l,
+            };
+            accidentDataArr = this.state.accidentData.filter(accident => {
+                return (curBounds.lngLeft < accident.position.lng && accident.position.lng < curBounds.lngRight) &&
+                (curBounds.latLeft < accident.position.lat && accident.position.lat < curBounds.latRight);
+            });
+        }
         
         this.setState(prevState => ({
             ...prevState,
             accidentFilterData: accidentDataArr,
         }),() => {
-            console.log('isNotInit..',this.isNotInit);
             if(!this.isNotInit){
-                // this.googleMap = this.googleMarkerMap;
                 this.isNotInit = true;
-            }});}
+            }});
+    }
     
     tabToggle(tab) {
         if (this.state.activeTab !== tab) {
-            // console.log('tab this.googleMap.getCenter() >>> ', this.googleMap.getCenter);
-            // console.log('tab this.googleMap.getCenter()>>>', new google.maps.LatLngBounds().getCenter());
             this.googleMap[tab].panTo({lat: this.googleMap[this.state.activeTab].getCenter().lat(), lng: this.googleMap[this.state.activeTab].getCenter().lng()});
-            // if(tab == this.CONST.NAME_CIRCLE_TAB) {
-            //     this.googleHeatMap.panTo({lat: this.googleMarkerMap.getCenter().lat(), lng: this.googleMarkerMap.getCenter().lng()});
-            // }else {
-            //     this.googleMarkerMap.panTo({lat: this.googleHeatMap.getCenter().lat(), lng: this.googleHeatMap.getCenter().lng()});
-            //     // this.googleMarkerMap.setCenter(this.googleHeatMap.getCenter());
-            // }
             
             this.setState({
                 activeTab: tab,
-                // mapPosition: this.googleMap.getCenter()
             });
         }
     }
@@ -491,20 +472,29 @@ class AccidentMap extends Component {
     //     });
     // }
 
-    onSelectBoxChangeHandler(ridingType) {
+    onSelectBoxRidingTypeHandler(ridingType) {
         this.setState(prevState => ({
             ...prevState,
             selectRidingType : ridingType,
         }),() => {
             this.loadAccidentData(this, this.state.startDate, this.state.endDate);
             this.loadChartData(this, this.state.startDate, this.state.endDate);
+            this.loadLineChartData(this, this.state.endDate);
+        });
+    }
+    
+    onSelectBoxLineChartHandler(period) {
+        this.setState(prevState => ({
+            ...prevState,
+            selectPeriod : period,
+        }),() => {
+            this.loadLineChartData(this, this.state.endDate);
         });
     }
     
     onChartSelectHandler(chartWrapper) {
         let chartIndex = chartWrapper.getChart().getSelection()[0].row,
             chartRegion = JSON.parse(chartWrapper.toJSON())['dataTable']['rows'][chartIndex]['c'][0]['v'];
-        console.log('onChartSelectHandelr >>> ', chartRegion);
         
         this.setState(prevState => ({
             ...prevState,
@@ -527,7 +517,6 @@ class AccidentMap extends Component {
 
         if (navigator.geolocation) {
             console.log("is geolocation!");
-            // this.loadAccidentData(this, this.state.startDate, this.state.endDate);
             navigator.geolocation.getCurrentPosition((position) => {
                 const pos = {
                     lat: position.coords.latitude,
@@ -539,8 +528,6 @@ class AccidentMap extends Component {
                     ...prevState,
                     curGoogleMapPos: pos,
                 }), () => {this.loadAccidentData(this, this.state.startDate, this.state.endDate);});
-                
-                // this.isNotGetLocation = true;
 
                 return pos;
             }, (error) => {
@@ -555,10 +542,96 @@ class AccidentMap extends Component {
         }
     }
     
+    async loadLineChartData(self, endDate) {
+        let lineChartData = [[{type: 'date', label: 'period'},'frequency count',]],
+            lineChartDic = {},
+            lineStartDate = new Date();
+
+        if(this.state.selectPeriod == 'week') {
+            lineStartDate.setDate(endDate.getDate()-7);
+        }else if(this.state.selectPeriod == 'month') {
+            lineStartDate.setMonth(endDate.getMonth()-1);
+        }else {
+            lineStartDate.setYear(endDate.getFullYear()-1);
+        }
+    
+        lineStartDate.setHours(0, 0, 0, 0);
+        
+        const queryObj = {
+            occured_date : JSON.stringify({$gte : timeFormatter(lineStartDate), $lt : timeFormatter(endDate)}),
+            sort: "occured_date",
+            order: 1,
+            riding_type: this.state.selectRidingType,
+        };
+        
+        const setLineChartDic = (period) => {
+            const year = endDate.getFullYear(),
+                month = endDate.getMonth(),
+                day = endDate.getDate();
+            
+            if(period == this.CONST.LINE_CHART_WEEK) {
+                for(let i=0 ; i<=7 ; i++) {
+                    lineChartDic[new Date(year, month, day-7+i)] = 0;
+                }
+            }else if(period == this.CONST.LINE_CHART_MONTH) {
+                for(let i=0 ; i<=30 ; i++) {
+                    lineChartDic[new Date(year, month, day-30+i)] = 0;
+                }
+            }else if(period == this.CONST.LINE_CHART_YEAR) {
+                for(let i=0 ; i<=12 ; i++) {
+                    lineChartDic[new Date(year, (month-12+i))] = 0;
+                }
+            }
+        };
+                
+        setLineChartDic(this.state.selectPeriod);
+        
+        await axios.get(getFullUri(self.apiUri.accident, queryObj))
+            .then((res) => {
+
+                let accidentDataLength = res.data.length;
+                    
+                const setInitPage = () => {
+                    self.setState(prevState => ({
+                        ...prevState,
+                        lineData: lineChartData, 
+                    }));
+                };
+                const dicToArray = (dic, callback) => {
+                    for(let key in dic){
+                        lineChartData.push([new Date(key), dic[key]]);    
+                    }
+                    
+                    lineChartData.sort((data1, data2) => {
+                        return data2[0]-data1[0];
+                    });
+                    callback();
+                };
+                
+                if(res.data.length == 0){
+                    dicToArray(lineChartDic, setInitPage);
+                }
+                res.data.forEach((accident, i) => { 
+                    let accidentDate = new Date(accident.occured_date);
+
+                    if(accidentDate >= lineStartDate && accidentDate <= this.state.endDate){
+                        accidentDate.setHours(0, 0, 0, 0); 
+                        if(lineChartDic[accidentDate] == undefined){
+                            lineChartDic[accidentDate] = 0;
+                        }
+                        
+                        lineChartDic[accidentDate]++;
+                    }
+
+                    if(i+1 == accidentDataLength){
+                        dicToArray(lineChartDic, setInitPage);
+                    }
+                });
+            });
+    }
+    
     async loadChartData(self, startDate, endDate) {
-        console.log('onChartClick >>> region', this.state.currentRegion);
         let queryObjForChart = {
-            // name:
             type: this.CONST.PIE_REGION[this.state.currentRegion.length],
             parent: this.state.currentRegion[this.state.currentRegion.length-1],
             occured_dates: JSON.stringify({$gte : timeFormatter(startDate), $lt : timeFormatter(endDate)}),
@@ -566,11 +639,8 @@ class AccidentMap extends Component {
             // order: 1,
         };
         
-        console.log("queryObjForChart>>>", queryObjForChart);
-        
         await axios.get(getFullUri(self.apiUri.accidentChart, queryObjForChart))
             .then((res) => {
-                console.log('accidentchart', res.data);
                 const resData = res.data;
                 let chartDataArr = [['Task', 'Accident Rate by Region']],
                     accidentTableDataArr = [],
@@ -578,9 +648,6 @@ class AccidentMap extends Component {
                     arrayEndIndex = 0;
 
                 const setInitPage = () => {
-                    // console.log('accidentChart setInitPage chartDataArr', chartDataArr);
-                    // console.log('accidentChart setInitPage accidentTableDataArr',accidentTableDataArr);
-                    console.log('loadChartData setInitPage...');
                     self.setState(prevState => ({
                         ...prevState,
                         startPage: 0,
@@ -589,20 +656,11 @@ class AccidentMap extends Component {
                         totalPageCount: totalPageNum,
                         accidentTableData: accidentTableDataArr,
                         currentTableData: accidentTableDataArr.slice(0, arrayEndIndex),
-                        currentRegion: resData.length === 0 ? [this.state.currentRegion[0]] : this.state.currentRegion,
-                        // accidentLocation: accidentLocationDic,
                         chartData: chartDataArr,
                     }));
                 };
-                
-                if(resData.length == 0) {
-                    setInitPage();
-                }
-                
                 const pushChartData = () => {
                     resData.forEach((value, index) => {
-                        console.log('resData.forEach value', value);
-                        console.log('resData.forEach index', index);
                         chartDataArr.push([value.name, value.occured_dates.length]);
                         accidentTableDataArr.push({
                             location: this.state.currentRegion.join(' ') + ' '+ value.name,
@@ -615,24 +673,19 @@ class AccidentMap extends Component {
                     totalPageNum = Math.ceil(tableDataLength / this.CONST.PAGE_SIZE);
                     arrayEndIndex = tableDataLength < this.CONST.PAGE_SIZE ? tableDataLength : this.CONST.PAGE_SIZE;
                     
-                    // chartDataArr.sort((data1, data2) => {
-                    //     return data2[1]-data1[1];
-                    // });
-                    
                     accidentTableDataArr.sort((data1, data2) => {
                         return data2['accidentsCount']-data1['accidentsCount'];
                     });
-                    console.log('accidentTableDataArr>>>', accidentTableDataArr);
-                    console.log('before setInitPage');
+
                     setInitPage();
                 };
-                pushChartData(); 
+                
+                pushChartData();
             });
     }
     
     async loadAccidentData(self, startDate, endDate) {
         console.log("Update accidentData!");
-        // console.log("this.googlemap >>> ", this.googleMap.getBounds());
         
         let queryObj = {
             occured_date : JSON.stringify({$gte : timeFormatter(startDate), $lt : timeFormatter(endDate)}),
@@ -643,31 +696,13 @@ class AccidentMap extends Component {
         };
         
         console.log("queryObj", queryObj);
-        // const makeAddress = (position,callback) => {
-        //     let address = '';
-        //     Geocode.fromLatLng(position.lat, position.lng).then(
-        //         response => {
-        //             address = response.results[0].formatted_address;
-        //             console.log('makeAddress position', position);
-        //             console.log('makeAddress address', address);
-        //             callback(address);
-        //         }
-        //     );
-        // };
 
         await axios.get(getFullUri(self.apiUri.accident, queryObj))
             .then((res) => {
                 
-                let accidentArr = [];
-                //     accidentTableDataArr = [],
-                //     chartDataArr = [['Task', 'Accident Rate by Region']],
-                //     // accidentLocationDic = {},
-                //     regionDic = {};
+                let accidentArr = [],
+                    accidentDataLength = res.data.length;
 
-                let accidentDataLength = res.data.length;
-                //     totalPageNum = 0,
-                //     arrayEndIndex = 0;
-                console.log('onSelectBoxChange accidentData', res.data );
                 const setInitPage = () => {
                     self.setState(prevState => ({
                         ...prevState,
@@ -685,7 +720,6 @@ class AccidentMap extends Component {
                         lng: accident.position.longitude,
                     };
                     
-                    // makeAddress(position, address => {
                     accidentArr.push({
                         key: i,
                         ridingType: accident.riding_type,
@@ -698,42 +732,10 @@ class AccidentMap extends Component {
                         realAddress: accident.realAddress,
                     });
 
-                    // const addressArr = address.split(' ');
-
-                    // if(this.state.selectRidingType === 'all' || this.state.selectRidingType === accident.riding_type){
-                    //     for(let i=0 ; i < addressArr.length ; i++){
-                    //         makeRegionDic(regionDic, addressArr, i);
-                    //     }       
-                    // }
-
                     if(accidentArr.length == accidentDataLength){
                         accidentArr.sort((data1,data2) => {
                             return data1.key-data2.key;
                         });
-                        
-                        // init chartData
-                        // if(regionDic.hasOwnProperty(0)){
-                        //     for(let locationKey in regionDic[this.state.currentRegion.length][this.state.currentRegion[0]]) {
-                        //         chartDataArr.push([locationKey,regionDic[this.state.currentRegion.length][this.state.currentRegion[0]][locationKey]]);
-                        //         accidentTableDataArr.push({
-                        //             location: this.state.currentRegion.join(' ') + ' '+ locationKey,
-                        //             accidentsCount: regionDic[this.state.currentRegion.length][this.state.currentRegion[0]][locationKey],
-                        //             key: locationKey 
-                        //         });
-                        //     }
-                            
-                        //     const tableDataLength = accidentTableDataArr.length;
-                        //     totalPageNum = Math.ceil(tableDataLength / this.CONST.PAGE_SIZE);
-                        //     arrayEndIndex = tableDataLength < this.CONST.PAGE_SIZE ? tableDataLength : this.CONST.PAGE_SIZE;
-                            
-                        //     chartDataArr.sort((data1, data2) => {
-                        //         return data2[1]-data1[1];
-                        //     });
-                            
-                        //     accidentTableDataArr.sort((data1, data2) => {
-                        //         return data2['accidentsCount']-data1['accidentsCount'];
-                        //     });
-                        // }
 
                         setInitPage();
                     }
@@ -770,74 +772,20 @@ class AccidentMap extends Component {
         }
     }
     
-    // getChartDictoArray(regionArr) {
-    //     let chartDataArr = [],
-    //         accidentTableDataArr = [],
-    //         accidentDataLength = 0,
-    //         totalPageNum = 0,
-    //         arrayEndIndex = 0;
-            
-    //     chartDataArr.push(['Task', 'Accident Rate by Region']);
-    //     console.log('regionArr...',regionArr);
-    //     const pushDictoArray = (dic,setTablePage) => {
-    //         for(let locationKey in dic[regionArr[regionArr.length-1]]){
-    //             chartDataArr.push([locationKey, dic[regionArr[regionArr.length-1]][locationKey]]);                
-    //             accidentTableDataArr.push({
-    //                 location: regionArr.join(' ') + ' '+ locationKey,
-    //                 accidentsCount: dic[regionArr[regionArr.length-1]][locationKey],
-    //                 key: locationKey
-    //             });
-    //             setTablePage(accidentTableDataArr);
-    //         }
-    //     };
-
-    //     const setChartData = () => {
-    //         this.setState(prevState => ({
-    //             ...prevState,
-    //             chartData: chartDataArr,
-    //             // currentRegionIndex: chartRegionIndex,
-    //             // regionArr: regionArr,
-    //             currentRegion: regionArr,
-    //             startPage: 0,
-    //             endPage: this.CONST.PAGE_COUNT < totalPageNum ? this.CONST.PAGE_COUNT-1 : Math.max(0,totalPageNum-1),
-    //             currentPage: 0,
-    //             totalPageCount: totalPageNum,
-    //             accidentTableData: accidentTableDataArr,
-    //             currentTableData: accidentTableDataArr.slice(0, arrayEndIndex),
-    //         }));
-    //     };
-        
-    //     pushDictoArray(this.state.regionData[regionArr.length],(dataArr) => {
-    //         accidentDataLength = dataArr.length,
-    //         totalPageNum = Math.ceil(accidentDataLength / this.CONST.PAGE_SIZE),
-    //         arrayEndIndex = accidentDataLength < this.CONST.PAGE_SIZE ? accidentDataLength : this.CONST.PAGE_SIZE;    
-    //     });
-
-    //     accidentTableDataArr.sort((data1, data2) => {
-    //         return data2['accidentsCount']-data1['accidentsCount'];
-    //     });
-        
-    //     chartDataArr.sort((data1, data2) => {
-    //         return data2[1]-data1[1];
-    //     });
-        
-    //     setChartData();
-    // }
-    
     render() {
         // in -> <div className={pageStyles['Page__content-top']}>
         // <Button color="primary" onClick={this.onCreateMdTrigger}>새 배너 생성</Button>
-        const self = this;
         let currentRegionSlice = '',
             endRegion = '';
-        if(this.state.chartData.length > 1){
-            if(this.state.currentRegion.length == 1)
+        
+        if(this.state.currentRegion.length == 1){
+            if(this.state.chartData.length > 1)
                 currentRegionSlice = this.state.currentRegion[0];
-            else {
-                const tempStr = this.state.currentRegion.join('>>');
-                currentRegionSlice = tempStr.substring(0,tempStr.lastIndexOf('>')+1);
-                endRegion = this.state.currentRegion[this.state.currentRegion.length-1];
-            }
+        }
+        else {
+            const tempStr = this.state.currentRegion.join('>>');
+            currentRegionSlice = tempStr.substring(0,tempStr.lastIndexOf('>')+1);
+            endRegion = this.state.currentRegion[this.state.currentRegion.length-1];
         }
 
         return (
@@ -873,11 +821,11 @@ class AccidentMap extends Component {
                             timeIntervals={1}
                         />
                         <SelectBox
-                            className={styles.AccidentMap__selectBox}
-                            options={this.CONST.SELECTBOX_OPTIONS}
-                            defaultValue={this.CONST.SELECTBOX_OPTIONS[0]}
+                            className={styles.AccidentMap__selectBox__ridingType}
+                            options={this.CONST.SELECTBOX_RIDING_TYPE_OPTIONS}
+                            defaultValue={this.CONST.SELECTBOX_RIDING_TYPE_OPTIONS[0]}
                             changeHandler={(data) => {
-                                this.onSelectBoxChangeHandler(data.target.value);
+                                this.onSelectBoxRidingTypeHandler(data.target.value);
                             }}
                         />
                     </div>
@@ -923,6 +871,23 @@ class AccidentMap extends Component {
                             />
                         </div>
                     </div>
+                    <SelectBox
+                        className={styles.AccidentMap__selectBox__lineChart}
+                        options={this.CONST.SELECTBOX_PERIOD_OPTIONS}
+                        defaultValue={this.CONST.SELECTBOX_PERIOD_OPTIONS[0]}
+                        changeHandler={(data) => {
+                            this.onSelectBoxLineChartHandler(data.target.value);
+                        }}
+                    />
+                    <Chart
+                        width={'100%'}
+                        height={'500px'}
+                        chartType="Line"
+                        loader={<div>Loading Chart</div>}
+                        data={this.state.lineData}
+                        options={this.CONST.LINE_OPTIONS}
+                    />
+
                     <Nav tabs>
                         <NavItem>
                             <NavLink
@@ -955,13 +920,9 @@ class AccidentMap extends Component {
                                                         console.log('debounce...');
                                                         if(this.isNotInit) {
                                                             this.setFilteredData();
-                                                            // console.log('this.googleMap.getCenter onBoundsChanged',this.googleMap.getCenter());
                                                         }
                                                     })
                                                 }
-                                                //this.state.onBoundsChanged
-                                                // onDragEnd={this.state.onDragEnd}
-                                                // onZoomChanged={this.state.onZoomChanged}
                                                 loadingElement={<div style={{ height: '100%' }} />}
                                                 containerElement={<div style={{ height: '700px' }} />}
                                                 mapElement={<div style={{ height: '100%' }} />}
@@ -984,7 +945,6 @@ class AccidentMap extends Component {
                                     <div>
                                         <div className={styles.AccidentMap__googleMap}>
                                             <MapWithCircle
-                                                // tabName={this.state.activeTab}
                                                 onMapMounted={this.state.onMapWithCircleMounted}
                                                 onBoundsChanged={
                                                     debounce(300, false, () => {

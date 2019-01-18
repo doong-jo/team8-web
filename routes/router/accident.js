@@ -80,7 +80,6 @@ router.post('/', (req, res, next) => {
     
     const insertAddress = (callback) => {
         accidentChartApi.getRealAddress(query.position, data => {
-            console.log('convert realAddress', data);
             if(!has(data,'lat')) {
                 query.realAddress = data;
                 callback(query);                
@@ -90,20 +89,18 @@ router.post('/', (req, res, next) => {
             }
         });
     };
-    
     console.log('insert realAddress >>> ',query);
     
     insertAddress((query) => {
         accidentApi.createAccident(query, (data) => {
-            // console.log('accident data>>>', data);
             if(data){
                 accidentChartApi.updateChartData(query, (data) => {
-                    console.log('res.json data>>>',data)
+                    console.log('res.json data>>>',data);
                     res.json(data);
                 });
             }
         });
-    })
+    });
 });
 
 module.exports = router;

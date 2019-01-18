@@ -46,7 +46,7 @@ module.exports = {
     },
     
     count : function(commandObj, callback) {
-        db.user.find(commandObj.query, commandObj.projection).count(function (err, count) {
+        db.user.find(commandObj.query, commandObj.projection).countDocuments(function (err, count) {
             if (err) {
                 console.log('user.js:count fail', err);
                 callback(0);

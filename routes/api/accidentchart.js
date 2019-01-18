@@ -32,11 +32,8 @@ module.exports = {
     },
 	
     getList : (viewReq, option, callback) => {
-        // {'country.대한민국.occured_dates':{$gte:ISODate('2018-12-01'), $lt: ISODate('2019-12-12')}}
-        let mongoQuery = commonApi.getFindQuery(viewReq, getDefaultProjection, option),
-            tempQuery = {},
-            regionArr = [];
-            
+        let mongoQuery = commonApi.getFindQuery(viewReq, getDefaultProjection, option);
+
         if( has(mongoQuery.query, 'occured_dates') ) {
             let convertQuery = mongoQuery.query;
             
@@ -61,33 +58,29 @@ module.exports = {
     },
     
     updateChartData : (query, callback) => {
-        let queryArrForChart = [],
-            flag = false;
+        let queryArrForChart = [];
         if( has(query, 'realAddress')){
             const addressArr = query.realAddress.split(' ');
-            // console.log('updateChartData addressArr>>>',addressArr);
             
             const queryForEach = (queryArr) => {
                 queryArr.forEach((queryForChart, index) => {
-                    // console.log('queryForChart>>>',queryForChart);
-                    const mongoFindQuery = commonApi.getFindQuery(queryForChart.query, {_id:1});
-                    accidentchartModel.find(mongoFindQuery, (data) => {
+                    const mongoFindQuery = commonApi.getFindQuery(queryForChart.query, getDefaultProjection);
+                    accidentchartModel.count(mongoFindQuery, (count) => {
+                        console.log("chartdata count >>> ",count);
                         let mongoUpdateQuery = commonApi.getUpdateQuery(queryForChart);
-                        // console.log('exist data', data);
-                        if(data.length > 0) {
+
+                        if(count > 0) {
                             mongoUpdateQuery.updateQuery.$push = {};
                             mongoUpdateQuery.updateQuery.$push.occured_dates = query.occured_date;
                             accidentchartModel.updateOne(mongoUpdateQuery, (data) => {
-                                // console.log('accidentChart update data>>>', data);
+                                console.log('accidentChart update>>>', data);
                             });
-                        } else {
+                        } else if(count != -1){
                             mongoUpdateQuery.query.occured_dates = query.occured_date;
                             accidentchartModel.insert(mongoUpdateQuery.query, (data) => {
-                                // console.log('accidentChart insert data>>>', data);
+                                console.log('accidentChart insert>>>', data);
                             });
                         }
-                        // console.log("length", queryArr.length);
-                        // console.log("index", index);
                         if(queryArr.length == index+1)
                             callback(true);
                     });
@@ -97,7 +90,6 @@ module.exports = {
             addressArr.forEach((value, index) => {
                 let queryForChart = {};
                 queryForChart.updateQuery = {};
-                // console.log('addressArr foreach value>>>',value);
                 queryForChart.query = {
                     name: value,
                     type: regionArr[index],
@@ -112,7 +104,6 @@ module.exports = {
         }
     },
     getRealAddress: (position, callback) => {
-        console.log('getRealAddress>>>', position);
         const geocoder = NodeGeocoder(options);
         geocoder.reverse({lat: position.latitude, lon: position.longitude}, (err,res) => {
             console.log('geocoder.reverse >>> res', res);
