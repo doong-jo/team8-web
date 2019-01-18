@@ -18,8 +18,8 @@ const SSLoptions = {
 };
 
 // TODO : use process.env
-const port1 = 1212,
-    // port2 = 443,
+const port1 = 80,
+    port2 = 443,
     tempDir = __dirname + '/temp_files/',
     mongoURI = 'mongodb://josungdong:01034823161@localhost:25321/admin';
 	  
@@ -102,9 +102,9 @@ http.createServer(app).listen(port1, () => {
     console.log("Express server listening on port " + port1);
 });
 
-// https.createServer(SSLoptions, app).listen(port2, () => {
-//     console.log("Express server listening on port " + port2);
-// });
+https.createServer(SSLoptions, app).listen(port2, () => {
+    console.log("Express server listening on port " + port2);
+});
 /*----------------------------------------------------------------------------*/
 
 /*--------------------------------EXECUTE-------------------------------------*/
