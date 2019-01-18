@@ -9,26 +9,8 @@ import styles from './App.scss';
 
 const App = () =>
     (
-<<<<<<< Updated upstream
-        <div className={`Header ${styles.App}`}>
-            <div className={styles.App__header}>
-                <header>
-                    <Header />
-                </header>
-            </div>
-            <div className={`GlobalSpace ${styles.App__globalspace}`}>
-                <div className={`GlobalSide ${styles.App__globalside}`}>
-                    <SideMenu />
-                </div>
-                <div className={`GlobalMain ${styles.App__globalmain}`}>
-                    <Route exact path="/userView" render={() => <UserView pageTitle="사용자 뷰" />} />
-                    <Route exact path="/deviceView" render={() => <DeviceView pageTitle="디바이스 뷰" />} />
-                </div>
-            </div>
-=======
         <div className={`GlobalMain ${styles.App__globalmain}`}>
             <Route exact path="/" render={() => <Main />} />
->>>>>>> Stashed changes
         </div>
     );
 // in globalmain
