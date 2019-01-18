@@ -4,6 +4,7 @@ const router = express.Router();
 
 // const template = require('./template');
 	  
+<<<<<<< Updated upstream
 const main = require('./router/main'),
     user = require('./router/user'),
     userview = require('./router/userview'),
@@ -29,5 +30,9 @@ router.get('*', function(req, res) {
     res.json('접근할 수 없는 페이지입니다.');
 });
 
+=======
+const main = require('./router/main');
+router.use('/', main);
+>>>>>>> Stashed changes
 
 module.exports = router;

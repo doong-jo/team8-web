@@ -1,5 +1,5 @@
 {
-  "name": "helper-internal",
+  "name": "team8-internal",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://sdong001:tksekfk31@github.com/sdong001/helper-internal.git"
+    "url": "git+https://sdong001:tksekfk31@github.com/sdong001/team8-internal.git"
   },
   "author": "JoSungDong",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sdong001/helper-internal/issues"
+    "url": "https://github.com/sdong001/team8-internal/issues"
   },
-  "homepage": "https://github.com/sdong001/helper-internal#readme",
+  "homepage": "https://github.com/sdong001/team8-internal#readme",
   "dependencies": {
     "@material-ui/core": "^1.1.0",
     "@material-ui/icons": "^1.1.0",
