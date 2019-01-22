@@ -51,7 +51,7 @@ const getPixelPositionOffset = (width, height) => ({
 const MapWithMarker = withScriptjs(withGoogleMap(props => {
     const markerImage = (hasAlerted, type) => {
         return {
-            url: hasAlerted ? "http://175.123.140.145:88/images/danger_" + type + ".png" : "http://175.123.140.145:88/images/warning_" + type + ".png",
+            url: hasAlerted ? "http://8riders.com:88/images/danger_" + type + ".png" : "http://8riders.com:88/images/warning_" + type + ".png",
             // This marker is 20 pixels wide by 32 pixels high.
             size: new google.maps.Size(32, 32),
             // The origin for this image is (0, 0).
